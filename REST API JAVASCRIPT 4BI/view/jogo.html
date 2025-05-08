@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 115vh;
+            margin: 0;
+        }
+
+        #container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 1125px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+        }
+
+        div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td button {
+            padding: 5px 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        td button:hover {
+            background-color: #c82333;
+        }
+
+        #divDados {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <h1>Cadastro de Jogo</h1>
+        
+        <div>
+            <label for="txtIJogo">ID do Jogo</label>
+            <input type="text" id="txtIJogo">
+        </div>
+        
+        <div>
+            <label for="txtNomeJogo">Nome do Jogo</label>
+            <input type="text" id="txtNomeJogo">
+        </div>
+        
+        <div>
+            <label for="txtPrecoJogo">Preço do Jogo</label>
+            <input type="text" id="txtPrecoJogo">
+        </div>
+        
+        <div>
+            <label for="txtDataJogo">Data do Jogo</label>
+            <input type="text" id="txtDataJogo">
+        </div>
+        
+        <div>
+            <label for="txtMetacriticJogo">Metacritic do Jogo</label>
+            <input type="text" id="txtMetacriticJogo">
+        </div>
+        
+        <div>
+            <label for="txtNjogadoresJogo">Número de Jogadores</label>
+            <input type="text" id="txtNjogadoresJogo">
+        </div>
+        
+        <div>
+            <label for="txtVersaoJogo">Versão do Jogo</label>
+            <input type="text" id="txtVersaoJogo">
+        </div>
+        
+        <div>
+            <label for="cboGeneros">Gênero do Jogo</label>
+            <select id="cboGeneros"></select>
+        </div>
+        
+        <div>
+            <label for="cboEstados">Estado do Jogo</label>
+            <select id="cboEstados"></select>
+        </div>
+        
+        <div>
+            <label for="txtFiltro">Filtro</label>
+            <input type="text" id="txtFiltro">
+        </div>
+        
+        <div>
+            <button id="btnCadastrar">Cadastrar Jogo</button>
+        </div>
+        
+        <div id="divDados"></div>
+    </div>
+</body>
+<script>
+    let JSON_GENEROS = {};
+    let JSON_ESTADOS = {};
+    let JSON_JOGOS = {};
+    const dadosLocalStorage = localStorage.getItem("dados");
+    const objUsuario = JSON.parse(dadosLocalStorage);
+
+    const divDados = document.getElementById("divDados");
+    const txtFiltro = document.getElementById("txtFiltro");
+    const txtIJogo = document.getElementById("txtIJogo");
+    const txtNomeJogo = document.getElementById("txtNomeJogo");
+    const txtPrecoJogo = document.getElementById("txtPrecoJogo");
+    const txtDataJogo = document.getElementById("txtDataJogo");
+    const txtMetacriticJogo = document.getElementById("txtMetacriticJogo");
+    const txtNjogadoresJogo = document.getElementById("txtNjogadoresJogo");
+    const txtVersaoJogo = document.getElementById("txtVersaoJogo");
+    const cboGeneros = document.getElementById("cboGeneros");
+    const cboEstados = document.getElementById("cboEstados");
+    const btnCadastrar = document.getElementById("btnCadastrar");
+
+    // Evento de filtro para buscar jogos
+    txtFiltro.onkeyup = function () {
+        construirTabela(JSON_JOGOS, txtFiltro.value);
+    }
+
+    // Criação da tabela
+    const tabela = document.createElement("table");
+    divDados.appendChild(tabela);
+    
+    const linhaCabecalho = document.createElement("tr");
+    const thID = document.createElement("th");
+    const thNome = document.createElement("th");
+    const thPreco = document.createElement("th");
+    const thData = document.createElement("th");
+    const thMetacritic = document.createElement("th");
+    const thNjogadores = document.createElement("th");
+    const thVersao = document.createElement("th");
+    const thGenero = document.createElement("th");
+    const thEstado = document.createElement("th");
+    const thExcluir = document.createElement("th");
+    const thSelecionar = document.createElement("th");
+    const thAtualizar = document.createElement("th");
+
+    // Cabeçalhos da tabela
+    thID.appendChild(document.createTextNode("ID"));
+    thNome.appendChild(document.createTextNode("Nome do Jogo"));
+    thPreco.appendChild(document.createTextNode("Preço"));
+    thData.appendChild(document.createTextNode("Data"));
+    thMetacritic.appendChild(document.createTextNode("Metacritic"));
+    thNjogadores.appendChild(document.createTextNode("Número de Jogadores"));
+    thVersao.appendChild(document.createTextNode("Versão"));
+    thGenero.appendChild(document.createTextNode("Gênero"));
+    thEstado.appendChild(document.createTextNode("Estado"));
+    thExcluir.appendChild(document.createTextNode("Excluir"));
+    thSelecionar.appendChild(document.createTextNode("Selecionar"));
+    thAtualizar.appendChild(document.createTextNode("Atualizar"));
+
+    // Adiciona cabeçalhos à linha
+    linhaCabecalho.appendChild(thID);
+    linhaCabecalho.appendChild(thNome);
+    linhaCabecalho.appendChild(thPreco);
+    linhaCabecalho.appendChild(thData);
+    linhaCabecalho.appendChild(thMetacritic);
+    linhaCabecalho.appendChild(thNjogadores);
+    linhaCabecalho.appendChild(thVersao);
+    linhaCabecalho.appendChild(thGenero);
+    linhaCabecalho.appendChild(thEstado);
+    linhaCabecalho.appendChild(thExcluir);
+    linhaCabecalho.appendChild(thSelecionar);
+    linhaCabecalho.appendChild(thAtualizar);
+    tabela.appendChild(linhaCabecalho);
+
+    get_jogos();
+    get_generos();
+    get_estados();
+
+    btnCadastrar.onclick = function () {
+        post_jogos();
+    }
+
+    function limparTabela() {
+        var qtdLinas = 1;
+        var totalLinhas = tabela.rows.length;
+        for (let i = qtdLinas; i < totalLinhas; i++) {
+            tabela.deleteRow(qtdLinas);
+        }
+
+    }
+    function delete_jogo(idJogo) {
+        const URI = "http://localhost:5050/jogo/" + idJogo;
+        console.log(URI);
+        fetch(URI, {
+            method: "DELETE",
+            headers: {
+
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_jogos();
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+    function construirTabela(JSON_JOGOS, filtro) {
+        limparTabela();
+        for (let jogo of JSON_JOGOS) {
+            let nomeJogo = jogo.nomeJogo.toLowerCase();
+            filtro = filtro.toLowerCase();
+            if (!nomeJogo.includes(filtro)) {
+                continue;
+            }
+            const linha = document.createElement("tr");
+
+            const btnExcluir = document.createElement("button");
+            btnExcluir.appendChild(document.createTextNode("Excluir"));
+            btnExcluir.onclick = function () {
+                const idJogo = jogo.idJogo;
+                delete_jogo(idJogo);
+            }
+
+            const btnSelecionar = document.createElement("button");
+            btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+            btnSelecionar.onclick = function () {
+                const obj = jogo;
+                selecionarJogo(obj);
+            }
+
+            const btnAtualizar = document.createElement("button");
+            btnAtualizar.appendChild(document.createTextNode("Atualizar"));
+            btnAtualizar.onclick = function () {
+                update_jogo();
+            }
+
+            const tdID = document.createElement("td");
+            const tdNome = document.createElement("td");
+            const tdPreco = document.createElement("td");
+            const tdData = document.createElement("td");
+            const tdMetacritic = document.createElement("td");
+            const tdNJogadores = document.createElement("td");
+            const tdVersao = document.createElement("td");
+            const tdGenero = document.createElement("td");
+            const tdEstado = document.createElement("td");
+            const tdExcluir = document.createElement("td");
+            const tdSelecionar = document.createElement("td");
+            const tdAtualizar = document.createElement("td");
+
+            tdID.appendChild(document.createTextNode(jogo.idJogo));
+            tdNome.appendChild(document.createTextNode(jogo.nomeJogo));
+            tdPreco.appendChild(document.createTextNode(jogo.precoJogo));
+            tdData.appendChild(document.createTextNode(jogo.dataJogo));
+            tdMetacritic.appendChild(document.createTextNode(jogo.metacriticJogo));
+            tdNJogadores.appendChild(document.createTextNode(jogo.njogadoresJogo));
+            tdVersao.appendChild(document.createTextNode(jogo.versaoJogo));
+            tdGenero.appendChild(document.createTextNode(jogo.nomeGenero));
+            tdEstado.appendChild(document.createTextNode(jogo.nomeEstado));
+            tdExcluir.appendChild(btnExcluir);
+            tdSelecionar.appendChild(btnSelecionar);
+            tdAtualizar.appendChild(btnAtualizar);
+
+            linha.appendChild(tdID);
+            linha.appendChild(tdNome);
+            linha.appendChild(tdPreco);
+            linha.appendChild(tdData);
+            linha.appendChild(tdMetacritic);
+            linha.appendChild(tdNJogadores);
+            linha.appendChild(tdVersao);
+            linha.appendChild(tdGenero);
+            linha.appendChild(tdEstado);
+            linha.appendChild(tdExcluir);
+            linha.appendChild(tdSelecionar);
+            linha.appendChild(tdAtualizar);
+            tabela.appendChild(linha);
+        }
+    }
+    function get_jogos() {
+        const URI = "http://localhost:5050/jogo";
+        console.log(URI);
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            JSON_JOGOS = JSON.parse(respostaConvertida);
+            JSON_JOGOS = JSON_JOGOS.jogos;
+            construirTabela(JSON_JOGOS, '');
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+    function update_jogo() {
+
+        const id = txtIJogo.value;
+        const nomeJogo = txtNomeJogo.value;
+        const precoJogo = txtPrecoJogo.value;
+        const dataJogo = txtDataJogo.value;
+        const metacriticJogo = txtMetacriticJogo.value;
+        const njogadoresJogo = txtNjogadoresJogo.value;
+        const versaoJogo = txtVersaoJogo.value;
+        const idGenero = cboGeneros.value;
+        const idEstado = cboEstados.value;
+
+        const corpo = {
+            "jogo": {
+                "nomeJogo": nomeJogo,
+                "precoJogo": precoJogo,
+                "dataJogo": dataJogo,
+                "metacriticJogo": metacriticJogo,
+                "njogadoresJogo": njogadoresJogo,
+                "versaoJogo": versaoJogo,
+                "genero_idGenero": idGenero,
+                "estado_idEstado": idEstado
+            }
+        };
+
+        if(nomeJogo==""){
+            alert("o nome não pode ser vazio");
+            return;
+        }
+
+        const URI = "http://localhost:5050/jogo/"+id;
+        fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(corpo),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_jogos();
+            const objResposta = JSON.parse(respostaConvertida);
+            if (objResposta.status == false) {
+                alert(objResposta.msg);
+            }
+
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+    function get_generos() {
+        const URI = "http://localhost:5050/genero/"
+        console.log(URI);
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            //console.log(respostaConvertida);
+            JSON_GENEROS = JSON.parse(respostaConvertida);
+            JSON_GENEROS = JSON_GENEROS.generos;
+            montarCombo1();
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+    function selecionarJogo(jogo) {
+        document.getElementById("txtIJogo").value = jogo.idJogo || "";
+        document.getElementById("txtNomeJogo").value = jogo.nomeJogo || "";
+        document.getElementById("txtPrecoJogo").value = jogo.precoJogo || ""; 
+        document.getElementById("txtDataJogo").value = jogo.dataJogo || "";
+        document.getElementById("txtMetacriticJogo").value = jogo.metacriticJogo || "";
+        document.getElementById("txtNjogadoresJogo").value = jogo.njogadoresJogo || "";
+        document.getElementById("txtVersaoJogo").value = jogo.versaoJogo || "";
+
+        document.getElementById("cboGeneros").value = jogo.idGenero || "";
+        document.getElementById("cboEstados").value = jogo.idEstado || "";
+    }
+
+    function get_estados() {
+        const URI = "http://localhost:5050/estado/"
+        console.log(URI);
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            //console.log(respostaConvertida);
+            JSON_ESTADOS = JSON.parse(respostaConvertida);
+            JSON_ESTADOS = JSON_ESTADOS.estados;
+            montarCombo2();
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+
+    function put_jogos(idJogo,nomeJogo) {
+        const URI = "http://localhost:5050/jogo/" + idJogo;
+        if (nomeJogo == "") {
+            alert("o nome do jogo não pode ser vazio");
+            return;
+        }
+
+        const objJogo = {
+            jogo: {
+                nomeJogo: nomeJogo
+            }
+        }
+
+        fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(objJogo),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_jogos();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+    function montarCombo1() {
+        for (let genero of JSON_GENEROS) {
+            const nomeGenero = genero.nomeGenero;
+            const idGenero = genero.idGenero;
+            const option = document.createElement("option");
+            option.value = idGenero;
+            option.text = nomeGenero;
+            cboGeneros.appendChild(option);
+        }
+    }
+
+    function montarCombo2() {
+        for (let estado of JSON_ESTADOS) {
+            const nomeEstado = estado.nomeEstado;
+            const idEstado = estado.idEstado;
+            const option = document.createElement("option");
+            option.value = idEstado;
+            option.text = nomeEstado;
+            cboEstados.appendChild(option);
+        }
+    }
+
+    function post_jogos() {
+        const URI = "http://localhost:5050/jogo/";
+        console.log(URI);
+
+        const id = txtIJogo.value;
+        const nomeJogo = txtNomeJogo.value;
+        const precoJogo = txtPrecoJogo.value;
+        const dataJogo = txtDataJogo.value;
+        const metacriticJogo = txtMetacriticJogo.value;
+        const njogadoresJogo = txtNjogadoresJogo.value;
+        const versaoJogo = txtVersaoJogo.value;
+        const idGenero = cboGeneros.value;
+        const idEstado = cboEstados.value;
+
+        if (!nomeJogo || !precoJogo || !dataJogo || !metacriticJogo || !njogadoresJogo || !versaoJogo || !idGenero || !idEstado) {
+            alert("Por favor, preencha todos os campos.");
+            return;
+        }
+
+        const corpo = {
+            "jogo":{
+                "nomeJogo": nomeJogo,
+                "precoJogo": precoJogo,
+                "dataJogo": dataJogo,
+                "metacriticJogo": metacriticJogo,
+                "njogadoresJogo": njogadoresJogo,
+                "versaoJogo": versaoJogo,
+                "genero_idGenero": idGenero,
+                "estado_idEstado": idEstado,
+            }
+        };
+        console.log(corpo);
+
+        fetch(URI, {
+            method: "POST",
+            body: JSON.stringify(corpo),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_jogos();
+            const objResposta = JSON.parse(respostaConvertida);
+            if (objResposta.status == false) {
+                alert(objResposta.msg);
+            }
+
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+    function delete_jogo(idJogo) {
+        const URI = "http://localhost:5050/jogo/" + idJogo;
+        console.log(URI);
+        fetch(URI, {
+            method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_jogos();
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+</script>
+
+</html>
