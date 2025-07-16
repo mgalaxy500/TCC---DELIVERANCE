@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Aluno</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 600px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+        }
+
+        div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td button {
+            padding: 5px 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        td button:hover {
+            background-color: #c82333;
+        }
+
+        #divDados {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <h1>Cadastro de Aluno</h1>
+        <div>
+            <label for="txtNomeAluno">Nome do Aluno</label>
+            <input type="text" id="txtNomeAluno">
+        </div>
+
+        <div>
+            <label for="txtMatriculaAluno">Matrícula do Aluno</label>
+            <input type="text" id="txtMatriculaAluno">
+        </div>
+
+        <div>
+            <label for="txtTurmaAluno">Turma do Aluno</label>
+            <input type="text" id="txtTurmaAluno">
+        </div>
+
+        <div>
+            <label for="txtFiltro">Filtro</label>
+            <input type="text" id="txtFiltro">
+        </div>
+        <div>
+            <button id="btnCadastrar">Cadastrar Aluno</button>
+        </div>
+        <div id="divDados"></div>
+    </div>
+
+    <script>
+        let JSON_ESTADOS = {};
+        const dadosLocalStorage = localStorage.getItem("dados");
+        const objUsuario = JSON.parse(dadosLocalStorage);
+
+        const divDados = document.getElementById("divDados");
+        const txtNome = document.getElementById("txtNomeAluno");
+        const txtMatricula = document.getElementById("txtMatriculaAluno");
+        const txtTurma = document.getElementById("txtTurmaAluno");
+        const txtFiltro = document.getElementById("txtFiltro");
+        txtFiltro.onkeyup = function () {
+            construirTabela(JSON_ESTADOS, txtFiltro.value);
+        }
+        const btnCadastrar = document.getElementById("btnCadastrar");
+
+        const tabela = document.createElement("table");
+
+        divDados.appendChild(tabela);
+        const linha1 = document.createElement("tr");
+        const td0 = document.createElement("th");
+        const td1 = document.createElement("th");
+        const td2 = document.createElement("th");
+        const td3 = document.createElement("th");
+        const td4 = document.createElement("th");
+        const td5 = document.createElement("th");
+        const td6 = document.createElement("th");
+        td0.appendChild(document.createTextNode("ID"));
+        td1.appendChild(document.createTextNode("NOME DO ALUNO"));
+        td2.appendChild(document.createTextNode("MATRICULA DO ALUNO"));
+        td3.appendChild(document.createTextNode("TURMA DO ALUNO"));
+        td4.appendChild(document.createTextNode("EXCLUIR"));
+        td5.appendChild(document.createTextNode("Selecionar"));
+        td6.appendChild(document.createTextNode("Atualizar"));
+        linha1.appendChild(td0);
+        linha1.appendChild(td1);
+        linha1.appendChild(td2);
+        linha1.appendChild(td3);
+        linha1.appendChild(td4);
+        linha1.appendChild(td5);
+        linha1.appendChild(td6);
+
+        get_alunos();
+
+        btnCadastrar.onclick = function () {
+            post_alunos();
+        }
+
+        function limparTabela() {
+            var qtdLinas = 1;
+            var totalLinhas = tabela.rows.length;
+            for (let i = qtdLinas; i < totalLinhas; i++) {
+                tabela.deleteRow(qtdLinas);
+            }
+
+        }
+        function delete_aluno(idAluno) {
+            const URI = "http://localhost:5050/aluno/" + idAluno;
+            fetch(URI, {
+                method: "DELETE",
+                headers: {
+                    'Authorization': 'Bearer ' + objUsuario.token
+                }
+            }).then((resposta) => {
+                return resposta.text();
+            }).then(respostaConvertida => {
+                get_alunos();
+            }).catch(erro => {
+                console.log(erro);
+            })
+        }
+        function construirTabela(objJson, filtro) {
+            limparTabela();
+
+            const alunos = objJson.alunos;
+
+            tabela.appendChild(linha1);
+            for (let aluno of alunos) {
+
+                let nomeAluno = aluno.nomeAluno.toLowerCase();
+                filtro = filtro.toLowerCase();
+                if (!nomeAluno.includes(filtro)) {
+                    continue;
+                }
+
+                const linha = document.createElement("tr");
+                const btnExcluir = document.createElement("button");
+                btnExcluir.appendChild(document.createTextNode("Excluir"));
+                btnExcluir.onclick = function () {
+                    delete_aluno(aluno.idAluno);
+                }
+
+                const txtAlterar = document.createElement("input");
+                txtAlterar.type = 'text';
+                txtAlterar.value = aluno.nomeAluno;
+                txtAlterar.disabled = true;
+
+                const btnSelecionar = document.createElement("button");
+                btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+                btnSelecionar.onclick = function () {
+                    txtAlterar.disabled = false;
+                }
+
+                const btnAtualizar = document.createElement("button");
+                btnAtualizar.appendChild(document.createTextNode("Atualizar"));
+                btnAtualizar.onclick = function () {
+                    const nomeAluno = txtAlterar.value;
+                    txtAlterar.disabled = true;
+                    put_alunos(aluno.idAluno, nomeAluno);
+                }
+
+                const td0 = document.createElement("td");
+                const td1 = document.createElement("td");
+                const td2 = document.createElement("td");
+                const td3 = document.createElement("td");
+                const td4 = document.createElement("td");
+
+                td0.appendChild(document.createTextNode(aluno.idAluno));
+                td1.appendChild(txtAlterar);
+                td2.appendChild(btnExcluir);
+                td3.appendChild(btnSelecionar);
+                td4.appendChild(btnAtualizar);
+
+                linha.appendChild(td0);
+                linha.appendChild(td1);
+                linha.appendChild(td2);
+                linha.appendChild(td3);
+                linha.appendChild(td4);
+                tabela.appendChild(linha);
+            }
+        }
+
+        function get_alunos() {
+            const URI = "http://localhost:5050/aluno";
+            fetch(URI, {
+                method: "GET",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + objUsuario.token
+                }
+            }).then((resposta) => {
+                return resposta.text();
+            }).then(respostaConvertida => {
+                JSON_ESTADOS = JSON.parse(respostaConvertida);
+                construirTabela(JSON_ESTADOS, '')
+            }).catch(erro => {
+                console.log(erro);
+            })
+        }
+
+        function put_alunos(idAluno, nomeAluno) {
+            const URI = "http://localhost:5050/aluno/" + idAluno;
+            if (!nomeAluno) {
+                alert("O nome do aluno não pode ser vazio");
+                return;
+            }
+
+            const objAluno = { aluno: { nomeAluno: nomeAluno } };
+
+            fetch(URI, {
+                method: "PUT",
+                body: JSON.stringify(objAluno),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + objUsuario.token
+                }
+            }).then((resposta) => {
+                return resposta.text();
+            }).then(respostaConvertida => {
+                const obj = JSON.parse(respostaConvertida);
+                if (obj.status == true) {
+                    get_alunos();
+                }
+            }).catch(erro => {
+                console.log(erro);
+            })
+        }
+
+        function post_alunos() {
+            const URI = "http://localhost:5050/aluno";
+            const nomeAluno = txtNome.value;
+            const matriculaAluno = txtMatricula.value;
+            const turmaAluno = txtTurma.value;
+
+            if (!nomeAluno) {
+                alert("O nome do aluno não pode ser vazio");
+                return;
+            }
+
+            const corpo = {
+                "aluno": {
+                    "nomeAluno": nomeAluno,
+                    "matriculaAluno": matriculaAluno,
+                    "turmaAluno": turmaAluno
+                }
+            };
+
+            fetch(URI, {
+                method: "POST",
+                body: JSON.stringify(corpo),
+                headers: {
+                    'Authorization': 'Bearer ' + objUsuario.token
+                }
+            }).then((resposta) => {
+                return resposta.text();
+            }).then(respostaConvertida => {
+                get_funcionarios();  // Atualiza a tabela após excluir
+                const objResposta = JSON.parse(respostaConvertida);
+                if (objResposta.status == false) {
+                    alert(objResposta.msg);
+                }
+            }).catch(erro => {
+                console.log(erro);
+            });
+        }
+    </script>
+
+</body>
+
+</html>

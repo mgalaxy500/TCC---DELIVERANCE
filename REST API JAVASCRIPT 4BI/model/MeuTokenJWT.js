@@ -26,8 +26,6 @@ class MeuTokenJWT {
             nbf: Math.floor(Date.now() / 1000), // Não é válido antes do tempo especificado
             jti: require('crypto').randomBytes(16).toString('hex'), // Identificador único (jti)
             email: parametroClaims.email, // Claims públicas
-            role: parametroClaims.role,
-            name: parametroClaims.name,
             idFuncionario: parametroClaims.idFuncionario // Claims privadas
         };
 

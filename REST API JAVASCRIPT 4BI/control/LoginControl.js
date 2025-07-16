@@ -1,22 +1,22 @@
 // Importa o módulo express para criação de APIs.
 const express = require('express');
-const Dev = require('../model/Dev');
 const MeuTokenJWT = require('../model/MeuTokenJWT');
+const Funcionario = require('../model/Funcionario');
 
 module.exports = class LoginControl {
 
     async login(request, response) {
-        const dev = new Dev();
-        dev.emailDev = request.body.dev.emailDev;
-        dev.senhaDev = request.body.dev.senhaDev;
+        const funcionario = new Funcionario();
+        funcionario.emailFuncionario = request.body.funcionario.emailFuncionario;
+        funcionario.senhaFuncionario = request.body.funcionario.senhaFuncionario;
 
-        const logou = await dev.login();
+        const logou = await funcionario.login();
 
         if (logou == true) {
             const payloadToken = {
-                idDev: dev.idDev,
-                emailDev: dev.emailDev,
-                senhaDev: dev.senhaDev,
+                idFuncionario: funcionario.idFuncionario,
+                emailFuncionario: funcionario.emailFuncionario,
+                senhaFuncionario: funcionario.senhaFuncionario,
             };
             const jwt = new MeuTokenJWT();
             const token_string = jwt.gerarToken(payloadToken);
@@ -25,10 +25,10 @@ module.exports = class LoginControl {
                 status: true,
                 cod: 1,
                 msg: 'logado com sucesso',
-                dev: {
-                    idDev: dev.idDev,
-                    emailDev: dev.emailDev,
-                    senhaDev: dev.senhaDev
+                funcionario: {
+                    idFuncionario: funcionario.idFuncionario,
+                    emailFuncionario: funcionario.emailFuncionario,
+                    senhaFuncionario: funcionario.senhaFuncionario,
                 },
                 token: token_string,
             };
@@ -36,7 +36,7 @@ module.exports = class LoginControl {
         } else {
             const objResposta = {
                 status: false,
-                msg: 'email do dev ou senha inválidos'
+                msg: 'email do funcionario ou senha inválidos'
             };
             return response.status(401).send(objResposta);
         }

@@ -90,8 +90,8 @@
 
     <script>
         const btnLogin = document.getElementById('btnLogin');
-        const txtEmailDev = document.getElementById("txtEmail");
-        const txtSenhaDev = document.getElementById("txtSenha");
+        const txtEmailFuncionario = document.getElementById("txtEmail");
+        const txtSenhaFuncionario = document.getElementById("txtSenha");
         const divResposta = document.getElementById("divResposta");
 
         btnLogin.onclick = function () {
@@ -99,17 +99,17 @@
         }
 
         function fazerLogin() {
-            const emailDev = txtEmailDev.value;
-            const senhaDev = txtSenhaDev.value;
+            const emailFuncionario = txtEmailFuncionario.value;
+            const senhaFuncionario = txtSenhaFuncionario.value;
 
             const obj_json = {
-                dev: {
-                    emailDev: emailDev,
-                    senhaDev: senhaDev
+                funcionario: {
+                    emailFuncionario: emailFuncionario,
+                    senhaFuncionario: senhaFuncionario
                 }
             };
             
-            const uri = 'http://127.0.0.1:5050/login'; // Certifique-se de que este é o URL correto
+            const uri = 'http://localhost:5050/login'; // Certifique-se de que este é o URL correto
 
             fetch(uri, {
                 method: "POST",

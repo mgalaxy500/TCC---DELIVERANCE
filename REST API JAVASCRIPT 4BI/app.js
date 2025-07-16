@@ -1,9 +1,10 @@
 const express = require('express');
 const path = require('path');  // Módulo para manipular caminhos de arquivo
-const EstadoRouter = require('./router/EstadoRouter');
-const GeneroRouter = require('./router/GeneroRouter');
-const JogoRouter = require('./router/JogoRouter');
-const DevRouter = require('./router/DevRouter');
+const ProfessorRouter = require('./router/ProfessorRouter');
+const DisciplinaRouter = require('./router/DisciplinaRouter');
+const RequisicaoRouter = require('./router/RequisicaoRouter');
+const FuncionarioRouter = require('./router/FuncionarioRouter');
+const AlunoRouter = require('./router/AlunoRouter');
 const LoginRouter = require('./router/LoginRouter');
 const cors = require('cors');
 
@@ -15,14 +16,15 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'view'))); // Configura a pasta 'view' como estática
 
-const estadoRoteador = new EstadoRouter();
-const generoRoteador = new GeneroRouter();
-const jogoRouter = new JogoRouter();
-const devsRouter = new DevRouter();
+const professorRoteador = new ProfessorRouter();
+const disciplinaRoteador = new DisciplinaRouter();
+const requisicaoRouter = new RequisicaoRouter();
+const funcionarioRouter = new FuncionarioRouter();
+const alunoRouter = new AlunoRouter();
 const loginRouter = new LoginRouter();
 
 app.use(cors({
-    origin: 'http://localhost', // permite requisições apenas do frontend específico
+    origin: ['http://localhost:5050', 'http://127.0.0.1:5050'], // permite requisições apenas do frontend específico
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true // se necessário, permite cookies e headers de autenticação
 }));
@@ -31,20 +33,24 @@ app.use('/login',
     loginRouter.createRoutes()
 );
 
-app.use('/estado',
-    estadoRoteador.createRoutes()
+app.use('/professor',
+    professorRoteador.createRoutes()
 );
 
-app.use('/genero',
-    generoRoteador.createRoutes()
+app.use('/disciplina',
+    disciplinaRoteador.createRoutes()
 );
 
-app.use('/jogo',
-    jogoRouter.createRoutes()
+app.use('/requisicao',
+    requisicaoRouter.createRoutes()
 );
 
-app.use('/dev',
-    devsRouter.createRoutes()
+app.use('/funcionario',
+    funcionarioRouter.createRoutes()
+);
+
+app.use('/aluno',
+    alunoRouter.createRoutes()
 );
 
 // Inicia o servidor, escutando na porta definida, e exibe uma mensagem no console com a URL onde o servidor está rodando.
