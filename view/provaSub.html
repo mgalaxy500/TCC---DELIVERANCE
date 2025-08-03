@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 115vh;
+            margin: 0;
+        }
+
+        #container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 1125px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+        }
+
+        div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td button {
+            padding: 5px 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        td button:hover {
+            background-color: #c82333;
+        }
+
+        #divDados {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <h1>Cadastro de ProvaSub</h1>
+        
+        <div>
+            <label for="txtIProvaSub">ID da ProvaSub</label>
+            <input type="text" id="txtIProvaSub">
+        </div>
+        
+        <div>
+            <label for="cboAlunos">Aluno da ProvaSub</label>
+            <select id="cboAlunos"></select>
+        </div>
+        
+        <div>
+            <label for="cboDisciplinas">Disciplina da ProvaSub</label>
+            <select id="cboDisciplinas"></select>
+        </div>
+        
+        <div>
+            <label for="txtFiltro">Filtro</label>
+            <input type="text" id="txtFiltro">
+        </div>
+        
+        <div>
+            <button id="btnCadastrar">Cadastrar ProvaSub</button>
+        </div>
+        
+        <div id="divDados"></div>
+    </div>
+</body>
+<script>
+    let JSON_PROFESSORES = {};
+    let JSON_JOGOS = {};
+    const dadosLocalStorage = localStorage.getItem("dados");
+    const objUsuario = JSON.parse(dadosLocalStorage);
+
+    const divDados = document.getElementById("divDados");
+    const txtFiltro = document.getElementById("txtFiltro");
+    const txtIProvaSub = document.getElementById("txtIdProvaSub");
+    const cboAlunos = document.getElementById("cboAlunos");
+    const cboDisciplinases = document.getElementById("cboDisciplinases");
+    const btnCadastrar = document.getElementById("btnCadastrar");
+
+    // Evento de filtro para buscar provaSubs
+    txtFiltro.onkeyup = function () {
+        construirTabela(JSON_DISCIPLINAS, txtFiltro.value);
+    }
+
+    // Criação da tabela
+    const tabela = document.createElement("table");
+    divDados.appendChild(tabela);
+    
+    const linhaCabecalho = document.createElement("tr");
+    const thID = document.createElement("th");
+    const thAlunos = document.createElement("th");
+    const thDisciplinas= document.createElement("th");
+    const thExcluir = document.createElement("th");
+    const thSelecionar = document.createElement("th");
+    const thAtualizar = document.createElement("th");
+
+    // Cabeçalhos da tabela
+    thID.appendChild(document.createTextNode("ID"));
+    thAlunos.appendChild(document.createTextNode("Aluno da ProvaSub"));
+    thDisciplinas.appendChild(document.createTextNode("Disciplinas da ProvaSub"));
+    thExcluir.appendChild(document.createTextNode("Excluir"));
+    thSelecionar.appendChild(document.createTextNode("Selecionar"));
+    thAtualizar.appendChild(document.createTextNode("Atualizar"));
+
+    // Adiciona cabeçalhos à linha
+    linhaCabecalho.appendChild(thID);
+    linhaCabecalho.appendChild(thNome);
+    linhaCabecalho.appendChild(thDisciplinas);
+    linhaCabecalho.appendChild(thExcluir);
+    linhaCabecalho.appendChild(thSelecionar);
+    linhaCabecalho.appendChild(thAtualizar);
+    tabela.appendChild(linhaCabecalho);
+
+    get_provaSubs();
+    get_disciplinas();
+
+    btnCadastrar.onclick = function () {
+        post_provaSubs();
+    }
+
+    function limparTabela() {
+        var qtdLinas = 1;
+        var totalLinhas = tabela.rows.length;
+        for (let i = qtdLinas; i < totalLinhas; i++) {
+            tabela.deleteRow(qtdLinas);
+        }
+
+    }
+    function delete_provaSub(idProvaSub) {
+        const URI = "http://localhost:5050/provaSub/" + idProvaSub;
+        console.log(URI);
+        fetch(URI, {
+            method: "DELETE",
+            headers: {
+
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_provaSubs();
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+    function construirTabela(JSON_JOGOS, filtro) {
+        limparTabela();
+        for (let provaSub of JSON_JOGOS) {
+            let nomeProvaSub = provaSub.nomeProvaSub.toLowerCase();
+            filtro = filtro.toLowerCase();
+            if (!nomeProvaSub.includes(filtro)) {
+                continue;
+            }
+            const linha = document.createElement("tr");
+
+            const btnExcluir = document.createElement("button");
+            btnExcluir.appendChild(document.createTextNode("Excluir"));
+            btnExcluir.onclick = function () {
+                const idProvaSub = provaSub.idProvaSub;
+                delete_provaSub(idProvaSub);
+            }
+
+            const btnSelecionar = document.createElement("button");
+            btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+            btnSelecionar.onclick = function () {
+                const obj = provaSub;
+                selecionarProvaSub(obj);
+            }
+
+            const btnAtualizar = document.createElement("button");
+            btnAtualizar.appendChild(document.createTextNode("Atualizar"));
+            btnAtualizar.onclick = function () {
+                update_provaSub();
+            }
+
+            const tdID = document.createElement("td");
+            const tdNome = document.createElement("td");
+            const tdDisciplinas = document.createElement("td");
+            const tdExcluir = document.createElement("td");
+            const tdSelecionar = document.createElement("td");
+            const tdAtualizar = document.createElement("td");
+
+            tdID.appendChild(document.createTextNode(provaSub.idProvaSub));
+            tdNome.appendChild(document.createTextNode(provaSub.nomeProvaSub));
+            tdDisciplinas.appendChild(document.createTextNode(provaSub.nomeDisciplinas));
+            tdExcluir.appendChild(btnExcluir);
+            tdSelecionar.appendChild(btnSelecionar);
+            tdAtualizar.appendChild(btnAtualizar);
+
+            linha.appendChild(tdID);
+            linha.appendChild(tdNome);
+            linha.appendChild(tdDisciplinas);
+            linha.appendChild(tdExcluir);
+            linha.appendChild(tdSelecionar);
+            linha.appendChild(tdAtualizar);
+            tabela.appendChild(linha);
+        }
+    }
+    function get_provaSubs() {
+        const URI = "http://localhost:5050/provaSub";
+        console.log(URI);
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            JSON_JOGOS = JSON.parse(respostaConvertida);
+            JSON_JOGOS = JSON_JOGOS.provaSubs;
+            construirTabela(JSON_JOGOS, '');
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+    function update_provaSub() {
+
+        const id = txtIProvaSub.value;
+        const nomeProvaSub = txtNomeProvaSub.value;
+        const idDisciplinas = cboDisciplinass.value;
+
+        const corpo = {
+            "provaSub": {
+                "nomeProvaSub": nomeProvaSub,
+                "disciplinas_idDisciplinas": idDisciplinas,
+            }
+        };
+
+        if(nomeProvaSub==""){
+            alert("o nome não pode ser vazio");
+            return;
+        }
+
+        const URI = "http://localhost:5050/provaSub/"+id;
+        fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(corpo),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_provaSubs();
+            const objResposta = JSON.parse(respostaConvertida);
+            if (objResposta.status == false) {
+                alert(objResposta.msg);
+            }
+
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+    function get_disciplinass() {
+        const URI = "http://localhost:5050/disciplinas/"
+        console.log(URI);
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            //console.log(respostaConvertida);
+            JSON_GENEROS = JSON.parse(respostaConvertida);
+            JSON_GENEROS = JSON_GENEROS.disciplinass;
+            montarCombo1();
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+    function selecionarProvaSub(provaSub) {
+        document.getElementById("txtIProvaSub").value = provaSub.idProvaSub || "";
+        document.getElementById("txtNomeProvaSub").value = provaSub.nomeProvaSub || "";
+        document.getElementById("cboDisciplinass").value = provaSub.idDisciplinas || "";
+    }
+
+    function get_estados() {
+        const URI = "http://localhost:5050/estado/"
+        console.log(URI);
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            //console.log(respostaConvertida);
+            JSON_PROFESSORES = JSON.parse(respostaConvertida);
+            JSON_PROFESSORES = JSON_PROFESSORES.estados;
+            montarCombo2();
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+
+    function put_provaSubs(idProvaSub,nomeProvaSub) {
+        const URI = "http://localhost:5050/provaSub/" + idProvaSub;
+        if (nomeProvaSub == "") {
+            alert("o nome do provaSub não pode ser vazio");
+            return;
+        }
+
+        const objProvaSub = {
+            provaSub: {
+                nomeProvaSub: nomeProvaSub
+            }
+        }
+
+        fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(objProvaSub),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_provaSubs();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+    function montarCombo1() {
+        for (let disciplinas of JSON_GENEROS) {
+            const nomeDisciplinas = disciplinas.nomeDisciplinas;
+            const idDisciplinas = disciplinas.idDisciplinas;
+            const option = document.createElement("option");
+            option.value = idDisciplinas;
+            option.text = nomeDisciplinas;
+            cboDisciplinass.appendChild(option);
+        }
+    }
+
+    function montarCombo2() {
+        for (let estado of JSON_PROFESSORES) {
+            const nomeEstado = estado.nomeEstado;
+            const idEstado = estado.idEstado;
+            const option = document.createElement("option");
+            option.value = idEstado;
+            option.text = nomeEstado;
+            cboEstados.appendChild(option);
+        }
+    }
+
+    function post_provaSubs() {
+        const URI = "http://localhost:5050/provaSub/";
+        console.log(URI);
+
+        const id = txtIProvaSub.value;
+        const nomeProvaSub = txtNomeProvaSub.value;
+        const idDisciplinas = cboDisciplinass.value;
+
+        if (!nomeProvaSub || !idDisciplinas) {
+            alert("Por favor, preencha todos os campos.");
+            return;
+        }
+
+        const corpo = {
+            "provaSub":{
+                "nomeProvaSub": nomeProvaSub,
+                "disciplinas_idDisciplinas": idDisciplinas,
+            }
+        };
+        console.log(corpo);
+
+        fetch(URI, {
+            method: "POST",
+            body: JSON.stringify(corpo),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_provaSubs();
+            const objResposta = JSON.parse(respostaConvertida);
+            if (objResposta.status == false) {
+                alert(objResposta.msg);
+            }
+
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+    function delete_provaSub(idProvaSub) {
+        const URI = "http://localhost:5050/provaSub/" + idProvaSub;
+        console.log(URI);
+        fetch(URI, {
+            method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_provaSubs();
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+</script>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 600px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+        }
+
+        div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td button {
+            padding: 5px 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        td button:hover {
+            background-color: #c82333;
+        }
+
+        #divDados {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <h1>Cadastro de Genero</h1>
+        <div>
+            <label for="txtNomeGenero">Nome do Genero</label>
+            <input type="text" id="txtNomeGenero">
+        </div>
+        <div>
+            <label for="txtFiltro">Filtro</label>
+            <input type="text" id="txtFiltro">
+        </div>
+        <div>
+            <button id="btnCadastrar">Cadastrar Genero</button>
+        </div>
+        <div id="divDados"></div>
+    </div>
+</body>
+<script>
+    let JSON_CARGOS = {};
+    const dadosLocalStorage = localStorage.getItem("dados");
+    const objUsuario = JSON.parse(dadosLocalStorage);
+
+    const divDados = document.getElementById("divDados");
+    const txtGenero = document.getElementById("txtNomeGenero");
+    const txtFiltro = document.getElementById("txtFiltro");
+    txtFiltro.onkeyup = function () {
+        //console.log(txtFiltro.value);
+        construirTabela(JSON_CARGOS, txtFiltro.value);
+    }
+    const btnCadastrar = document.getElementById("btnCadastrar");
+
+    const tabela = document.createElement("table");
+
+    divDados.appendChild(tabela);
+    const linha1 = document.createElement("tr");
+    const td0 = document.createElement("th");
+    const td1 = document.createElement("th");
+    const td2 = document.createElement("th");
+    const td3 = document.createElement("th");
+    const td4 = document.createElement("th");
+    td0.appendChild(document.createTextNode("ID"));
+    td1.appendChild(document.createTextNode("Nome Genero"));
+    td2.appendChild(document.createTextNode("EXCLUIR"));
+    td3.appendChild(document.createTextNode("Selecionar"));
+    td4.appendChild(document.createTextNode("Atualizar"));
+    linha1.appendChild(td0);
+    linha1.appendChild(td1);
+    linha1.appendChild(td2);
+    linha1.appendChild(td3);
+    linha1.appendChild(td4);
+
+    get_generos();
+
+    btnCadastrar.onclick = function () {
+        post_generos();
+    }
+
+    function limparTabela() {
+        var qtdLinas = 1;
+        var totalLinhas = tabela.rows.length;
+        for (let i = qtdLinas; i < totalLinhas; i++) {
+            tabela.deleteRow(qtdLinas);
+        }
+
+    }
+    function delete_genero(idGenero) {
+        const URI = "http://localhost:5050/genero/" + idGenero;
+        console.log(URI);
+        fetch(URI, {
+            method: "DELETE",
+            headers: {
+
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_generos();
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+    function construirTabela(objJson, filtro) {
+        limparTabela();
+
+
+        const generos = objJson.generos;
+
+
+        tabela.appendChild(linha1);
+        for (let genero of generos) {
+
+            let nomeGenero = genero.nomeGenero;
+            nomeGenero = nomeGenero.toLowerCase();
+            filtro = filtro.toLowerCase();
+            if (nomeGenero.includes(filtro) == false) {
+                continue;
+            }
+            const linha1 = document.createElement("tr");
+            const btnExcluir = document.createElement("button");
+            btnExcluir.appendChild(document.createTextNode("Excluir"));
+            btnExcluir.onclick = function () {
+                const idGenero = genero.idGenero;
+                delete_genero(idGenero);
+            }
+
+
+            const txtAlterar = document.createElement("input");
+            txtAlterar.type = 'text';
+            txtAlterar.value = genero.nomeGenero;
+            txtAlterar.disabled = true;
+
+            const btnSelecionar = document.createElement("button");
+            btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+            btnSelecionar.onclick = function () {
+                txtAlterar.disabled = false;
+
+                //const idGenero = genero.idGenero;
+                //txtGenero.value = genero.nomeGenero;
+            }
+
+            const btnAtualizar = document.createElement("button");
+            btnAtualizar.appendChild(document.createTextNode("Atualizar"));
+
+            btnAtualizar.onclick = function () {
+                const idGenero = genero.idGenero;
+                const txt = txtAlterar;
+                txt.disabled = true;
+                const nomeGenero = txt.value;
+                
+                put_generos(idGenero,nomeGenero);
+            }
+
+            const td0 = document.createElement("td");
+            const td1 = document.createElement("td");
+            const td2 = document.createElement("td");
+            const td3 = document.createElement("td");
+            const td4 = document.createElement("td");
+
+
+
+            td0.appendChild(document.createTextNode(genero.idGenero));
+            td1.appendChild(txtAlterar);
+
+            td2.appendChild(btnExcluir);
+            td3.appendChild(btnSelecionar);
+            td4.appendChild(btnAtualizar);
+
+            linha1.appendChild(td0);
+            linha1.appendChild(td1);
+            linha1.appendChild(td2);
+            linha1.appendChild(td3);
+            linha1.appendChild(td4);
+            tabela.appendChild(linha1);
+        }
+    }
+
+    function get_generos() {
+        const URI = "http://localhost:5050/genero";
+
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            JSON_CARGOS = JSON.parse(respostaConvertida);
+            construirTabela(JSON_CARGOS, '')
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+
+    function put_generos(idGenero,nomeGenero) {
+        const URI = "http://localhost:5050/genero/" + idGenero;
+        if (nomeGenero == "") {
+            alert("o nome do genero não pode ser vazio");
+            return;
+        }
+
+        const objGenero = {
+            genero: {
+                nomeGenero: nomeGenero
+            }
+        }
+
+        fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(objGenero),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_generos();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+    function post_generos() {
+        const URI = "http://localhost:5050/genero";
+        const nomeGenero = txtGenero.value;
+        if (nomeGenero == "") {
+            alert("o nome do genero não pode ser vazio");
+            return;
+
+        }
+
+        const objGenero = {
+            genero: {
+                nomeGenero: nomeGenero
+            }
+        }
+
+        fetch(URI, {
+            method: "POST",
+            body: JSON.stringify(objGenero),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_generos();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+</script>
+
+</html>

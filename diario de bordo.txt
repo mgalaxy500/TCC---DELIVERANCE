@@ -1,0 +1,15 @@
+dia 15-05
+consertei algumas coisas, mas acho que o fato de a Sarah e Isa irem embora cedo hoje e me deixarem aos lobos mais cedo me fez querer investir menos tempo nisso.
+Parei na parte de "matriculaAluno", o middleware por algum motivo não consegue identificar o valor no JSON
+
+dia 16-07
+
+eu acho que viver é overrated. fora isso, fazer a maldição da conversão do banco de dados para um EXCEL, usando um arquivo novo, similar ao do CSV
+
+dia 03-08 (eu continuei mexendo nesses 3 meses, mas nunca lembro de escrever, ok?)
+
+resolvi vários bugs, continuar a partir do AlunoControl, pois o CORPO não pode estar plano
+
+Tarefas:
+
+-adicionar os professores e justificativas no BD

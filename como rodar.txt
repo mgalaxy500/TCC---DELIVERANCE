@@ -1,0 +1,11 @@
+Abra o App.js (mesma pasta deste arquivo) no Visual Studio e abra o terminal (Ctrl + '). Use "cd" para ir para a pasta do App.js (ex.: cd C:\xampp\htdocs) e depois digite "node App.js"
+
+Depois, veja se o CMD mostrou a mensagem "API rodando no endereço "http://localhost:5050/"
+
+Caso sim, abra este endereço em um navegador qualquer, e adicione "/login" no final. Endereço: "http://localhost:5050/login"
+
+Dê uma olhada no banco de dados e use um login válido. A senha estará encriptada em MD5, então use um site (https://md5decrypt.net/en) para decodifica-lá.
+
+Para adicionar valores no banco de dados e verificá-los, use o HeidiSQL
+
+Para verificar se as requisições como "http:localhost:5050/professor GET" estão funcionando, use o Insomnia

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        nome Genero<input type="text" id="txtNomeGenero">
+    </div>
+    <div>
+        Filtro<input type="text" id="txtFiltro">
+    </div>
+    <div>
+        <button id="btnCadastrar">Cadastrar Genero</button>
+    </div>
+    <div id="divDados"></div>
+</body>
+<script>
+    let JSON_GENEROS = {};
+    const dadosLocalStorage = localStorage.getItem("dados");
+    const objUsuario = JSON.parse(dadosLocalStorage);
+
+    const divDados = document.getElementById("divDados");
+    const txtGenero = document.getElementById("txtNomeGenero");
+    const txtFiltro = document.getElementById("txtFiltro");
+    txtFiltro.onkeyup = function () {
+        //console.log(txtFiltro.value);
+        construirTabela(JSON_GENEROS, txtFiltro.value);
+    }
+    const btnCadastrar = document.getElementById("btnCadastrar");
+
+    const tabela = document.createElement("table");
+
+    divDados.appendChild(tabela);
+    const linha1 = document.createElement("tr");
+    const td0 = document.createElement("th");
+    const td1 = document.createElement("th");
+    const td2 = document.createElement("th");
+    const td3 = document.createElement("th");
+    const td4 = document.createElement("th");
+    td0.appendChild(document.createTextNode("ID"));
+    td1.appendChild(document.createTextNode("NOME DO GENERO"));
+    td2.appendChild(document.createTextNode("EXCLUIR"));
+    td3.appendChild(document.createTextNode("Selecionar"));
+    td4.appendChild(document.createTextNode("Atualizar"));
+    linha1.appendChild(td0);
+    linha1.appendChild(td1);
+    linha1.appendChild(td2);
+    linha1.appendChild(td3);
+    linha1.appendChild(td4);
+
+    get_generos();
+
+    btnCadastrar.onclick = function () {
+        post_generos();
+    }
+
+    function limparTabela() {
+        var qtdLinas = 1;
+        var totalLinhas = tabela.rows.length;
+        for (let i = qtdLinas; i < totalLinhas; i++) {
+            tabela.deleteRow(qtdLinas);
+        }
+
+    }
+    function delete_genero(idGenero) {
+        const URI = "/generos/" + idGenero;
+        console.log(URI);
+        fetch(URI, {
+            method: "DELETE",
+            headers: {
+
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_generos();
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+    function construirTabela(objJson, filtro) {
+        limparTabela();
+
+
+        const generos = objJson.generos;
+
+
+        tabela.appendChild(linha1);
+        for (let genero of generos) {
+
+            let nomeGenero = genero.nomeGenero;
+            nomeGenero = nomeGenero.toLowerCase();
+            filtro = filtro.toLowerCase();
+            if (nomeGenero.includes(filtro) == false) {
+                continue;
+            }
+            const linha1 = document.createElement("tr");
+            const btnExcluir = document.createElement("button");
+            btnExcluir.appendChild(document.createTextNode("Excluir"));
+            btnExcluir.onclick = function () {
+                const idGenero = genero.idGenero;
+                delete_genero(idGenero);
+            }
+
+            const btnSelecionar = document.createElement("button");
+            btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+            btnSelecionar.onclick = function () {
+                const idGenero = genero.idGenero;
+                txtGenero.value = genero.nomeGenero;
+            }
+
+            const btnAtualizar = document.createElement("button");
+            btnAtualizar.appendChild(document.createTextNode("Atualizar"));
+
+            btnAtualizar.onclick = function () {
+                const idGenero = genero.idGenero;
+                put_generos(idGenero);
+            }
+
+            const td0 = document.createElement("td");
+            const td1 = document.createElement("td");
+            const td2 = document.createElement("td");
+            const td3 = document.createElement("td");
+            const td4 = document.createElement("td");
+            td1.appendChild(document.createTextNode(genero.idGenero));
+            td1.appendChild(document.createTextNode(genero.nomeGenero));
+            td2.appendChild(btnExcluir);
+            td3.appendChild(btnSelecionar);
+            td4.appendChild(btnAtualizar);
+
+            linha1.appendChild(td0);
+            linha1.appendChild(td1);
+            linha1.appendChild(td2);
+            linha1.appendChild(td3);
+            linha1.appendChild(td4);
+            tabela.appendChild(linha1);
+        }
+    }
+
+    function get_generos() {
+        const URI = "/genero";
+
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            JSON_GENEROS = JSON.parse(respostaConvertida);
+            construirTabela(JSON_GENEROS, '')
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+
+    function put_generos(idGenero) {
+        const URI = "/generos/" + idGenero;
+        const nomeGenero = txtGenero.value;
+        if (nomeGenero == "") {
+            alert("o nome do genero não pode ser vazio");
+            return;
+
+        }
+
+        const objGenero = {
+            genero: {
+                nomeGenero: nomeGenero
+            }
+        }
+
+        fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(objGenero),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_generos();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+    function post_generos() {
+        const URI = "/genero";
+        const nomeGenero = txtGenero.value;
+        if (nomeGenero == "") {
+            alert("o nome do genero não pode ser vazio");
+            return;
+
+        }
+
+        const objGenero = {
+            genero: {
+                nomeGenero: nomeGenero
+            }
+        }
+
+        fetch(URI, {
+            method: "POST",
+            body: JSON.stringify(objGenero),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_generos();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+</script>
+
+</html>
