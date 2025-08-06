@@ -12,7 +12,7 @@ module.exports = class AlunoMiddleware {
             // Se o nome for inválido, cria um objeto de resposta com o status falso e a mensagem de erro.
             const objResposta = {
                 status: false,
-                msg: "A matricula deve ter deve ter 8"
+                msg: "A matricula deve ter deve ter 8 caracteres"
             }
             // Envia a resposta com status HTTP 400 e a mensagem de erro.
             response.status(400).send(objResposta);
@@ -23,43 +23,42 @@ module.exports = class AlunoMiddleware {
     }
     // Método assíncrono para verificar se já existe um aluno com o mesmo nome cadastrado.
     async isNot_alunoByMatriculaAluno(request, response, next) {
-        // Recupera o nome do aluno enviado no corpo da requisição (request body).
-        const matriculaAluno = request.body.aluno.matriculaAluno;
-        // Cria uma nova instância do modelo Aluno.
-        const objAluno = new Aluno();
-        // Define o nome do aluno na instância do modelo.
-        objAluno.matriculaAluno = matriculaAluno;
-        // Verifica se o aluno já existe no banco de dados chamando o método isAluno().
-        const alunoExiste = await objAluno.isAlunoByNomeAluno();
-        // Se o aluno já existir no banco de dados, cria um objeto de resposta com o status falso e uma mensagem de erro.
-        if (alunoExiste == false) {
-            next(); // Chama o próximo middleware ou rota
-        } else {
-            const objResposta = {
-                status: false,
-                msg: "Não é possível cadastrar um aluno com a mesma matricula de um aluno existente"
-            }
-            response.status(400).send(objResposta);
-        }
-    }
-    async isAlunoById(request, response, next) {
+        // Recupera a matrícula do aluno enviado no corpo da requisição
+        try {
+            const matriculaAluno = request.body.aluno?.matriculaAluno;
 
-        const idAluno = request.body.idAluno
-
-        const objAluno = new Aluno();
-
-        const alunoExiste = await objAluno.isAlunoById(idAluno);
-
-        if (alunoExiste == true) {
-            next();
-
-        } else {
-            const objResposta = {
-                status: false,
-                msg: "Aluno Não Existe"
+            if (!matriculaAluno) {
+                return response.status(400).send({
+                    status: false,
+                    msg: "Matrícula do aluno não informada."
+                });
             }
 
-            response.status(400).send(objResposta);
+            // Cria uma nova instância do modelo Aluno
+            const objAluno = new Aluno();
+            objAluno.matriculaAluno = matriculaAluno;
+
+            // Chama um método que verifica se a matrícula já existe
+            const alunoExiste = await objAluno.isAlunoByMatricula(matriculaAluno);
+
+            if (alunoExiste) {
+                // Se a matrícula já existe, retorna erro
+                return response.status(400).send({
+                    status: false,
+                    msg: "Não é possível cadastrar um aluno com a mesma matrícula de um aluno existente."
+                });
+            }
+
+            // Se não existe, segue para o próximo middleware
+                    next();
+        } 
+            
+        catch (err) {
+            console.error("Erro interno:", err);
+            return response.status(500).send({
+                status: false,
+                msg: "Erro interno ao verificar matrícula do aluno."
+            });
         }
     }
 }

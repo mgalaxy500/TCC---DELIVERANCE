@@ -6,17 +6,19 @@ class Disciplina {
     // Construtor da classe Disciplina que inicializa as propriedades.
     constructor() {
         this._idDisciplina = null;  // ID do disciplina, inicialmente nulo.
-        this._nomeDisciplina = null;  // Nome do disciplina, inicialmente uma string vazia.
-        this._professor = new Professor()
+        this._nomeDisciplina = null; 
+        this._turmaDisciplina = null; // Nome do disciplina, inicialmente uma string vazia.
+        this._professor = new Professor(); 
+        this._professor.idProfessor = null;
     }
 
     // Método assíncrono para criar um novo disciplina no banco de dados.
     async create() {
         const conexao = Banco.getConexao();  // Obtém a conexão com o banco de dados.
-        const SQL = 'INSERT INTO disciplina (nomeDisciplina, turmaDisciplina) VALUES (?, ?);';  // Query SQL para inserir o nome do disciplina.
+        const SQL = 'INSERT INTO disciplina (nomeDisciplina, turmaDisciplina, professor_idProfessor) VALUES (?, ?, ?);';
 
         try {
-            const [result] = await conexao.promise().execute(SQL, [this._nomeDisciplina, this._turmaDisciplina]);  // Executa a query.
+            const [result] = await conexao.promise().execute(SQL, [this._nomeDisciplina, this._turmaDisciplina, this._professor.idProfessor]);  // Executa a query.
             this._idDisciplina = result.insertId;  // Armazena o ID gerado pelo banco de dados.
             return result.affectedRows > 0;  // Retorna true se a inserção afetou alguma linha.
         } catch (error) {
@@ -35,12 +37,12 @@ class Disciplina {
                 disciplina.nomeDisciplina = disciplinaData.nomeDisciplina.trim();
 
                 try {
-                    const SQL = 'INSERT INTO disciplina (nomeDisciplina, turmaDisciplina) VALUES (?, ?);';
-                    const [result] = await conexao.promise().execute(SQL, [disciplina.nomeDisciplina, disciplina.turmaDisciplina]);
+                    const SQL = 'INSERT INTO disciplina (nomeDisciplina, turmaDisciplina, professor_idProfessor) VALUES (?, ?);';
+                    const [result] = await conexao.promise().execute(SQL, [disciplina.nomeDisciplina, disciplina.turmaDisciplina, disciplina.professor_idProfessor]);
                     
                     if (result.affectedRows > 0) {
                         disciplina._idDisciplina = result.insertId;
-                        disciplinasCriados.push({ nomeDisciplina: disciplina.nomeDisciplina, turmaDisciplina: disciplina.turmaDisciplina,  idDisciplina: disciplina._idDisciplina });
+                        disciplinasCriados.push({ nomeDisciplina: disciplina.nomeDisciplina, turmaDisciplina: disciplina.turmaDisciplina,  idDisciplina: disciplina._idDisciplina, professor_idProfessor: disciplina.professor.idProfessor });
                     } else {
                         console.error(`Falha ao criar o disciplina: ${disciplina.nomeDisciplina}`);
                     }
@@ -70,7 +72,7 @@ class Disciplina {
     // Método assíncrono para atualizar os dados de um disciplina no banco de dados.
     async update() {
         const conexao = Banco.getConexao();  // Obtém a conexão com o banco de dados.
-        const SQL = 'UPDATE disciplina SET nomeDisciplina = ?, turmaDisciplina = ?, Professor.idProfessor = ? WHERE idDisciplina = ?;';  // Query SQL para atualizar o nome de um disciplina.
+        const SQL = 'UPDATE disciplina SET nomeDisciplina = ?, turmaDisciplina = ?, professor.idProfessor = ? WHERE idDisciplina = ?;';  // Query SQL para atualizar o nome de um disciplina.
 
         try {
             const [result] = await conexao.promise().execute(SQL, [this._nomeDisciplina, this._idDisciplina]);  // Executa a query de atualização.
@@ -157,14 +159,13 @@ class Disciplina {
         return this;  // Retorna a instância atual para permitir encadeamento de chamadas.
     }
 
-    get professorDisciplina() {
-        return this._professorDisciplina;
+    get professor_idProfessor() {
+        return this._professor.idProfessor; // 
     }
 
-    // Setter para definir o valor de nomeDisciplina.
-    set professorDisciplina(professorDisciplina) {
-        this._professorDisciplina = professorDisciplina;
-        return this;  // Retorna a instância atual para permitir encadeamento de chamadas.
+    set professor_idProfessor(professor_idProfessor) {
+        this._professor.idProfessor = professor_idProfessor;
+        return this;
     }
 }
 

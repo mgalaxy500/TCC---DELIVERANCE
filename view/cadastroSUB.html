@@ -129,6 +129,11 @@
         </div>
 
         <div>
+            <label for="cboMateria">Matéria</label>
+            <select id="cboMateria"></select>
+        </div>
+
+        <div>
             <label for="cboJusti">Justificativa</label>
             <select id="cboJusti" name="justi">
                 <option value="atestado">Atestado Médico</option>
@@ -147,12 +152,13 @@
     
     let JSON_CADASTRO = {};
     let JSON_PROF = {};
+    let JSON_MATERIA = {};
     const dadosLocalStorage = localStorage.getItem("dados");
     const objUsuario = JSON.parse(dadosLocalStorage);
 
     const divDados = document.getElementById("divDados");
     const txtFiltro = document.getElementById("txtFiltro");
-    const txtIAluno = document.getElementById("txtIAluno");
+    const txtIdAluno = document.getElementById("txtIdAluno");
     const txtNomeAluno = document.getElementById("txtNomeAluno");
     const txtProfessorAluno = document.getElementById("txtProfessorAluno");
     const txtDataProva = document.getElementById("txtDataProva");
@@ -199,11 +205,11 @@
     linhaCabecalho.appendChild(thAtualizar);
     tabela.appendChild(linhaCabecalho);
 
-    get_alunos();
+    get_cadastros();
     get_professores();
 
     btnCadastrar.onclick = function () {
-        post_alunos();
+        post_cadastros();
     }
 
     function limparTabela() {
@@ -214,8 +220,8 @@
         }
 
     }
-    function delete_aluno(idAluno) {
-        const URI = "http://localhost:5050/aluno/" + idAluno;
+    function delete_cadastro(idAluno) {
+        const URI = "http://localhost:5050/cadastro/" + idAluno;
         console.log(URI);
         fetch(URI, {
             method: "DELETE",
@@ -227,16 +233,16 @@
             return resposta.text();
         }).then(respostaConvertida => {
             console.log(respostaConvertida);
-            get_alunos();
+            get_cadastros();
         }).catch(erro => {
             console.log(erro);
         })
     }
 
-    function construirTabela(JSON_JOGOS, filtro) {
+    function construirTabela(JSON_CADASTRO, filtro) {
         limparTabela();
-        for (let aluno of JSON_JOGOS) {
-            let nomeAluno = aluno.nomeAluno.toLowerCase();
+        for (let cadastro of JSON_CADASTRO) {
+            let nomeAluno = cadastro.nomeAluno.toLowerCase();
             filtro = filtro.toLowerCase();
             if (!nomeAluno.includes(filtro)) {
                 continue;
@@ -246,21 +252,21 @@
             const btnExcluir = document.createElement("button");
             btnExcluir.appendChild(document.createTextNode("Excluir"));
             btnExcluir.onclick = function () {
-                const idAluno = aluno.idAluno;
-                delete_aluno(idAluno);
+                const idAluno = cadastro.idAluno;
+                delete_cadastro(idAluno);
             }
 
             const btnSelecionar = document.createElement("button");
             btnSelecionar.appendChild(document.createTextNode("Selecionar"));
             btnSelecionar.onclick = function () {
-                const obj = aluno;
+                const obj = cadastro;
                 selecionarAluno(obj);
             }
 
             const btnAtualizar = document.createElement("button");
             btnAtualizar.appendChild(document.createTextNode("Atualizar"));
             btnAtualizar.onclick = function () {
-                update_aluno();
+                update_cadastro();
             }
 
             const tdRM = document.createElement("td");
@@ -273,12 +279,12 @@
             const tdSelecionar = document.createElement("td");
             const tdAtualizar = document.createElement("td");
 
-            tdRM.appendChild(document.createTextNode(aluno.idAluno));
-            tdNome.appendChild(document.createTextNode(aluno.nomeAluno));
-            tdProfessor.appendChild(document.createTextNode(aluno.professorAluno));
-            tdData.appendChild(document.createTextNode(aluno.dataProva));
-            tdMateria.appendChild(document.createTextNode(aluno.materiaAluno));
-            tdJustificativa.appendChild(document.createTextNode(aluno.justificativaAluno));
+            tdRM.appendChild(document.createTextNode(cadastro.idAluno));
+            tdNome.appendChild(document.createTextNode(cadastro.nomeAluno));
+            tdProfessor.appendChild(document.createTextNode(cadastro.professorAluno));
+            tdData.appendChild(document.createTextNode(cadastro.dataProva));
+            tdMateria.appendChild(document.createTextNode(cadastro.materiaAluno));
+            tdJustificativa.appendChild(document.createTextNode(cadastro.justificativaAluno));
             tdExcluir.appendChild(btnExcluir);
             tdSelecionar.appendChild(btnSelecionar);
             tdAtualizar.appendChild(btnAtualizar);
@@ -295,8 +301,8 @@
             tabela.appendChild(linha);
         }
     }
-    function get_alunos() {
-        const URI = "http://localhost:5050/aluno";
+    function get_cadastros() {
+        const URI = "http://localhost:5050/cadas";
         console.log(URI);
         fetch(URI, {
             method: "GET",
@@ -308,32 +314,33 @@
             return resposta.text();
         }).then(respostaConvertida => {
             JSON_JOGOS = JSON.parse(respostaConvertida);
-            JSON_JOGOS = JSON_JOGOS.alunos;
-            construirTabela(JSON_JOGOS, '');
+            JSON_JOGOS = JSON_JOGOS.cadastros;
+            construirTabela(JSON_, '');
         }).catch(erro => {
             console.log(erro);
         })
     }
 
-    function update_aluno() {
+    function update_cadastro() {
 
-        const id = txtIAluno.value;
+        const idAluno = txtIdAluno.value;
         const nomeAluno = txtNomeAluno.value;
         const professorAluno = txtProfessorAluno.value;
         const dataProva = txtDataProva.value;
-        const materiaAluno = txtMateriaAluno.value;
         const justificativaAluno = txtJustificativaAluno.value;
-        const idGenero = cboProf.value;
-        const idJusti = cboJustis.value;
+        const idProf = cboProf.value;
+        const idMateria = cboMateria.value;
+        const idJusti = cboJusti.value;
 
         const corpo = {
-            "aluno": {
+            "cadastro": {
                 "nomeAluno": nomeAluno,
+                "idAluno": idAluno,
                 "professorAluno": professorAluno,
                 "dataProva": dataProva,
-                "materiaAluno": materiaAluno,
                 "justificativaAluno": justificativaAluno,
-                "prof_idGenero": idGenero,
+                "prof_idProf": idProf,
+                "materia_idMateria": idMateria,
                 "justi_idJusti": idJusti
             }
         };
@@ -343,7 +350,7 @@
             return;
         }
 
-        const URI = "http://localhost:5050/aluno/"+id;
+        const URI = "http://localhost:5050/cadastro/"+id;
         fetch(URI, {
             method: "PUT",
             body: JSON.stringify(corpo),
@@ -355,7 +362,7 @@
             return resposta.text();
         }).then(respostaConvertida => {
             console.log(respostaConvertida);
-            get_alunos();
+            get_cadastros();
             const objResposta = JSON.parse(respostaConvertida);
             if (objResposta.status == false) {
                 alert(objResposta.msg);
@@ -387,28 +394,28 @@
         });
     }
 
-    function selecionarAluno(aluno) {
-        document.getElementById("txtIdAluno").value = aluno.idAluno || "";
-        document.getElementById("txtNomeAluno").value = aluno.nomeAluno || "";
-        document.getElementById("txtProfessorAluno").value = aluno.professorAluno || ""; 
-        document.getElementById("txtDataProva").value = aluno.dataProva || "";
-        document.getElementById("txtMateriaAluno").value = aluno.materiaAluno || "";
-        document.getElementById("txtJustificativaAluno").value = aluno.justificativaAluno || "";
+    function selecionarAluno(cadastro) {
+        document.getElementById("txtIdAluno").value = cadastro.idAluno || "";
+        document.getElementById("txtNomeAluno").value = cadastro.nomeAluno || "";
+        document.getElementById("txtProfessorAluno").value = cadastro.professorAluno || ""; 
+        document.getElementById("txtDataProva").value = cadastro.dataProva || "";
+        document.getElementById("txtJustificativaAluno").value = cadastro.justificativaAluno || "";
 
-        document.getElementById("cboProf").value = aluno.idProf || "";
-        document.getElementById("cboJustis").value = aluno.idJusti || "";
+        document.getElementById("cboProf").value = cadastro.idProf || "";
+        document.getElementById("cboMateria").value = cadastro.idMateria || "";
+        document.getElementById("cboJustis").value = cadastro.idJusti || "";
     }
 
 
-    function put_alunos(idAluno,nomeAluno) {
-        const URI = "http://localhost:5050/aluno/" + idAluno;
+    function put_cadastros(idAluno,nomeAluno) {
+        const URI = "http://localhost:5050/cadastro/" + idAluno;
         if (nomeAluno == "") {
-            alert("o nome do aluno não pode ser vazio");
+            alert("o nome do cadastro não pode ser vazio");
             return;
         }
 
         const objAluno = {
-            aluno: {
+            cadastro: {
                 nomeAluno: nomeAluno
             }
         }
@@ -426,7 +433,7 @@
         }).then(respostaConvertida => {
             const obj = JSON.parse(respostaConvertida);
             if (obj.status == true) {
-                get_alunos();
+                get_cadastros();
             }
             console.log(respostaConvertida);
         }).catch(erro => {
@@ -435,7 +442,7 @@
 
     }
 
-    function montarCombo1() {
+    function montarComboProf() {
         const cboProf = document.getElementById("cboProf");
         cboProf.innerHTML = ''; // limpa opções antigas
 
@@ -451,32 +458,50 @@
         }
     }
 
-    function post_alunos() {
-        const URI = "http://localhost:5050/aluno/";
+    function montarComboMateria() {
+        const cboMateria = document.getElementById("cboMateria");
+        cboMateria.innerHTML = ''; // limpa opções antigas
+
+        for (let materia of JSON_MATERIA) {
+            const nomeMateria = materia.nomeMateria;
+            const idMateria = materia.idMateria;
+
+            const option = document.createElement("option");
+            option.value = idMateria;
+            option.text = nomeMateria;
+
+            cboMateria.appendChild(option);
+        }
+    }
+
+    function post_cadastros() {
+        const URI = "http://localhost:5050/cadastro/";
+        console.log(URI);
         console.log(URI);
 
-        const id = txtIAluno.value;
+        const id = txtIdAluno.value;
         const nomeAluno = txtNomeAluno.value;
         const professorAluno = txtProfessorAluno.value;
         const dataProva = txtDataProva.value;
         const materiaAluno = txtMateriaAluno.value;
         const justificativaAluno = txtJustificativaAluno.value;
         const idProf = cboProf.idProf.value;
-        const Justi = cboJusti.value;
+        const idMateria = cboMateria.idMateria.value;
+        const idJusti = cboJusti.value;
 
-        if (!nomeAluno || !professorAluno || !dataProva || !materiaAluno || !justificativaAluno || !idGenero || !idJusti) {
+        if (!nomeAluno || !professorAluno || !dataProva || !materiaAluno || !justificativaAluno || !idProf || !idJusti) {
             alert("Por favor, preencha todos os campos.");
             return;
         }
 
         const corpo = {
-            "aluno":{
+            "cadastro":{
                 "nomeAluno": nomeAluno,
                 "professorAluno": professorAluno,
                 "dataProva": dataProva,
                 "materiaAluno": materiaAluno,
                 "justificativaAluno": justificativaAluno,
-                "prof_idGenero": idGenero,
+                "prof_idProf": idProf,
                 "justi_idJusti": idJusti,
             }
         };
@@ -493,7 +518,7 @@
             return resposta.text();
         }).then(respostaConvertida => {
             console.log(respostaConvertida);
-            get_alunos();
+            get_cadastros();
             const objResposta = JSON.parse(respostaConvertida);
             if (objResposta.status == false) {
                 alert(objResposta.msg);
@@ -504,8 +529,8 @@
         });
     }
 
-    function delete_aluno(idAluno) {
-        const URI = "http://localhost:5050/aluno/" + idAluno;
+    function delete_cadastro(idAluno) {
+        const URI = "http://localhost:5050/cadastro/" + idAluno;
         console.log(URI);
         fetch(URI, {
             method: "DELETE",
@@ -517,7 +542,7 @@
             return resposta.text();
         }).then(respostaConvertida => {
             console.log(respostaConvertida);
-            get_alunos();
+            get_cadastros();
         }).catch(erro => {
             console.log(erro);
         })

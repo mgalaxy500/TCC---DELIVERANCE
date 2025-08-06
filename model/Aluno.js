@@ -43,7 +43,7 @@ class Aluno {
                     
                     if (result.affectedRows > 0) {
                         aluno._idAluno = result.insertId;
-                        alunosCriados.push({ nomeAluno: aluno.nomeAluno, matriculaaluno : aluno.matriculaAluno, alunoAluno: aluno.turmaAluno,  idAluno: aluno._idAluno });
+                        alunosCriados.push({ nomeAluno: aluno.nomeAluno, matriculaAluno : aluno.matriculaAluno, alunoAluno: aluno.turmaAluno,  idAluno: aluno._idAluno });
                     } else {
                         console.error(`Falha ao criar o aluno: ${aluno.nomeAluno}`);
                     }
@@ -91,16 +91,15 @@ class Aluno {
     }
 
     // Método assíncrono para verificar se um aluno já existe no banco de dados.
-    async isAlunoByNomeAluno() {
+    async isAlunoByMatricula(matriculaAluno) {
         const conexao = Banco.getConexao();  // Obtém a conexão com o banco de dados.
-        const SQL = 'SELECT COUNT(*) AS qtd FROM aluno WHERE nomeAluno = ?;';  // Query SQL para contar alunos com o mesmo nome.
-
+        const SQL = 'SELECT * FROM aluno WHERE matriculaAluno = ?';
         try {
-            const [rows] = await conexao.promise().execute(SQL, [this._nomeAluno]);  // Executa a query.
-            return rows[0].qtd > 0;  // Retorna true se houver algum aluno com o mesmo nome.
+            const [rows] = await conexao.promise().execute(SQL, [matriculaAluno]);
+            return rows.length > 0; // retorna true se existir
         } catch (error) {
-            console.error('Erro ao verificar o aluno:', error);  // Exibe erro no console se houver falha.
-            return false;  // Retorna false caso ocorra um erro.
+            console.error('Erro ao verificar matrícula do aluno:', error);
+            throw error;
         }
     }
 

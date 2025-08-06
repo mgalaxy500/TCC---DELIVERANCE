@@ -13,3 +13,10 @@ resolvi vários bugs, continuar a partir do AlunoControl, pois o CORPO não pode
 Tarefas:
 
 -adicionar os professores e justificativas no BD
+
+dia 05-08
+
+eu vou dirigiiiiiiiiir, depois de bebeeeeeeeeeer
+
+enfim, algumas mudanças na lógica do BD envolvendo as turmas, disciplinas e professores
+Terminar de adaptar as turmas na página de disciplinas
