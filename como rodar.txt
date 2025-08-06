@@ -1,4 +1,4 @@
-Instale o Node.js no Windows (não lembro como faz, olha no google) ]
+Instale o Node.js no Windows (não lembro como faz, olha no google)
 
 Abra o App.js (mesma pasta deste arquivo) no Visual Studio e abra o terminal (Ctrl + '). 
 
