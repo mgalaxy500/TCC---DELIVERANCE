@@ -16,7 +16,9 @@ class Aluno {
         const SQL = 'INSERT INTO aluno (nomeAluno, matriculaAluno, turmaAluno) VALUES (?, ?, ?);';  // Query SQL para inserir o nome do aluno.
 
         try {
+            console.log(this._nomeAluno, this._matriculaAluno, this._turmaAluno);
             const [result] = await conexao.promise().execute(SQL, [this._nomeAluno, this._matriculaAluno, this._turmaAluno]);  // Executa a query.
+            
             this._idAluno = result.insertId;  // Armazena o ID gerado pelo banco de dados.
             return result.affectedRows > 0;  // Retorna true se a inserção afetou alguma linha.
         } catch (error) {

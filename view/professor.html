@@ -294,14 +294,18 @@
                 return;
             }
 
-            const objProfessor = { professor: { nomeProfessor: nomeProfessor } };
+            const corpo = { 
+                "professor": {
+                    "nomeProfessor": nomeProfessor 
+                } 
+            };
 
             fetch(URI, {
                 method: "POST",
-                body: JSON.stringify(objProfessor),
+                body: JSON.stringify(corpo),
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json', 
                     'Authorization': 'Bearer ' + objUsuario.token
                 }
             }).then((resposta) => {
@@ -315,6 +319,7 @@
                 console.log(erro);
             })
         }
+        
     </script>
 
 </body>

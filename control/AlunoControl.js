@@ -13,6 +13,8 @@ module.exports = class AlunoControl {
         var aluno = new Aluno();
         // Atribui o nome do aluno passado no corpo da requisição (request body) à instância criada.
         aluno.nomeAluno = request.body.aluno.nomeAluno;
+        aluno.matriculaAluno = request.body.aluno.matriculaAluno;
+        aluno.turmaAluno = request.body.aluno.turmaAluno;
         // Chama o método create() do modelo Aluno para inserir o novo aluno no banco de dados.
         const isCreated = await aluno.create();
         // Cria um objeto de resposta contendo o código, status e a mensagem de sucesso ou erro.

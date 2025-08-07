@@ -226,8 +226,9 @@
         fetch(URI, {
             method: "DELETE",
             headers: {
-
-                'Authorization': 'Bearer ' + objUsuario.token
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json', // <-- ESSENCIAL!
+                    'Authorization': 'Bearer ' + objUsuario.token
             }
         }).then((resposta) => {
             return resposta.text();
@@ -307,7 +308,8 @@
         fetch(URI, {
             method: "GET",
             headers: {
-                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json', // <-- ESSENCIAL!
                 'Authorization': 'Bearer ' + objUsuario.token
             }
         }).then((resposta) => {
@@ -355,7 +357,8 @@
             method: "PUT",
             body: JSON.stringify(corpo),
             headers: {
-                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json', // <-- ESSENCIAL!
                 'Authorization': 'Bearer ' + objUsuario.token
             }
         }).then((resposta) => {
@@ -379,7 +382,8 @@
         fetch(URI, {
             method: "GET",
             headers: {
-                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json', // <-- ESSENCIAL!
                 'Authorization': 'Bearer ' + objUsuario.token
             }
         }).then((resposta) => {
@@ -511,7 +515,8 @@
             method: "POST",
             body: JSON.stringify(corpo),
             headers: {
-                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json', // <-- ESSENCIAL!
                 'Authorization': 'Bearer ' + objUsuario.token
             }
         }).then((resposta) => {
@@ -535,7 +540,8 @@
         fetch(URI, {
             method: "DELETE",
             headers: {
-                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json', // <-- ESSENCIAL!
                 'Authorization': 'Bearer ' + objUsuario.token
             }
         }).then((resposta) => {

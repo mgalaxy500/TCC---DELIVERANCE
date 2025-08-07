@@ -4,11 +4,17 @@ const Disciplina = require('../model/Disciplina');
 module.exports = class DisciplinaMiddleware {
     // Método para validar o nome do disciplina antes de prosseguir com a criação ou atualização.
     async validar_NomeDisciplina(request, response, next) {
-
+        if (!request.body || !request.body.disciplina || !request.body.disciplina.nomeDisciplina) {
+        const objResposta = {
+            status: false,
+            msg: "O campo nomeDisciplina é obrigatório"
+        }
+        return response.status(400).send(objResposta);
+    }
         // Recupera o nome do disciplina enviado no corpo da requisição (request body).
         const nomeDisciplina = request.body.disciplina.nomeDisciplina;
         // Verifica se o nome do disciplina tem menos de 3 caracteres.
-        if (nomeDisciplina.length < 3) {
+        if (nomeDisciplina.length <= 3) {
             // Se o nome for inválido, cria um objeto de resposta com o status falso e a mensagem de erro.
             const objResposta = {
                 status: false,

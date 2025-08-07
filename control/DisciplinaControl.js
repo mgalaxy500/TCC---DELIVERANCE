@@ -12,7 +12,10 @@ module.exports = class DisciplinaControl {
         var disciplina = new Disciplina();
         // Atribui o nome do disciplina passado no corpo da requisição (request body) à instância criada.
         disciplina.nomeDisciplina = request.body.disciplina.nomeDisciplina;
+        disciplina.turmaDisciplina = request.body.disciplina.turmaDisciplina;
+        disciplina.professor_idProfessor = request.body.disciplina.professor_idProfessor;
         // Chama o método create() do modelo Disciplina para inserir o novo disciplina no banco de dados.
+        console.log(disciplina);
         const isCreated = await disciplina.create();
         // Cria um objeto de resposta contendo o código, status e a mensagem de sucesso ou erro.
         const objResposta = {
@@ -49,6 +52,8 @@ module.exports = class DisciplinaControl {
         // Atribui o ID e o nome do disciplina passados na URL e no corpo da requisição, respectivamente.
         disciplina.idDisciplina = request.params.idDisciplina;
         disciplina.nomeDisciplina = request.body.disciplina.nomeDisciplina;
+        disciplina.turmaDisciplina = request.body.disciplina.turmaDisciplina;
+        disciplina.professor_idProfessor = request.body.disciplina.professor_idProfessor;
         // Chama o método update() do modelo Disciplina para atualizar o disciplina no banco de dados.
         const isUpdated = await disciplina.update();
         // Cria um objeto de resposta com o código, status e a mensagem de sucesso ou erro.
