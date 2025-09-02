@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Desenvolvedores</title>
+  <link rel="stylesheet" href="CSS/funcionario.css">    
+</head>
+
+<body>
+  <div class="faixa-topo">
+    <div class="univap-logo"></div>
+    <div class="faixa-base"></div>
+  </div>
+
+<div id="container">
+  <h1>Cadastro de Desenvolvedores</h1>
+
+  <div class="form-container">
+    <div class="id-container caixas-texto">
+      <label class="text-id">ID do Desenvolvedor</label>
+      <input type="text" id="txtIdFuncionario" disabled>
+    </div>
+
+    <div class="email-container caixas-texto">
+      <label class="text-email">Email do Desenvolvedor</label>
+      <input type="text" id="txtEmailFuncionario">
+    </div>
+
+    <div class="senha-container caixas-texto">
+      <label class="text-senha">Senha do Desenvolvedor</label>
+      <input type="password" id="txtSenhaFuncionario">
+    </div>
+
+    <div class="button-container">
+      <button id="btnCadastrar" class="enviar-button">Cadastrar</button>
+    </div>
+  </div>
+
+  <div id="divDados"></div>
+</div>
+
+
+  <script>
+      let JSON_CARGOS = {};
+      let JSON_FUNCIONARIOS = {};
+
+      const dadosLocalStorage = localStorage.getItem("dados");
+      const objUsuario = JSON.parse(dadosLocalStorage);
+
+      const txtIFuncionario = document.getElementById("txtIFuncionario");
+      const txtEmailFuncionario = document.getElementById("txtEmailFuncionario");
+      const txtSenhaFuncionario = document.getElementById("txtSenhaFuncionario");
+      const btnCadastrar = document.getElementById("btnCadastrar");
+
+      const divDados = document.getElementById("divDados");
+      const tabela = document.createElement("table");
+      const linha1 = document.createElement("tr");
+
+      const td0 = document.createElement("th");
+      const td1 = document.createElement("th");
+      const td2 = document.createElement("th");
+      const td3 = document.createElement("th");
+      const td4 = document.createElement("th");
+
+      td0.appendChild(document.createTextNode("ID"));
+      td1.appendChild(document.createTextNode("Email"));
+      td2.appendChild(document.createTextNode("Selecionar"));
+      td3.appendChild(document.createTextNode("Atualizar"));
+      td4.appendChild(document.createTextNode("Excluir"));
+
+      divDados.appendChild(tabela);
+      tabela.appendChild(linha1);
+
+      linha1.appendChild(td0);
+      linha1.appendChild(td1);
+      linha1.appendChild(td2);
+      linha1.appendChild(td3);
+      linha1.appendChild(td4);
+
+      btnCadastrar.onclick = function () {
+          post_funcionarios();
+      }
+
+      get_funcionarios();
+
+      function limparTabela() {
+          var qtdLinas = 1;
+          var totalLinhas = tabela.rows.length;
+          for (let i = qtdLinas; i < totalLinhas; i++) {
+              tabela.deleteRow(qtdLinas);
+          }
+      }
+
+      function delete_funcionario(idFuncionario) {
+          const URI = "http://localhost:5050/funcionario/" + idFuncionario;
+          fetch(URI, {
+              method: "DELETE",
+              headers: {
+                  'Authorization': 'Bearer ' + objUsuario.token
+              }
+          }).then((resposta) => {
+              return resposta.text();
+          }).then(respostaConvertida => {
+              get_funcionarios();  // Atualiza a tabela após excluir
+          }).catch(erro => {
+              console.log(erro);
+          });
+      }
+
+      function update_funcionario() {
+          const id = txtIFuncionario.value;
+          const emailFuncionario = txtEmailFuncionario.value;
+          const senhaFuncionario = txtSenhaFuncionario.value;
+
+          if (emailFuncionario == "") {
+              alert("O email não pode ser vazio");
+              return;
+          }
+
+          const corpo = {
+              "funcionario": {
+                  "emailFuncionario": emailFuncionario,
+                  "senhaFuncionario": senhaFuncionario,
+              }
+          }
+          const URI = "http://localhost:5050/funcionario/" + id;
+          fetch(URI, {
+              method: "PUT",
+              body: JSON.stringify(corpo),
+              headers: {
+                  'Authorization': 'Bearer ' + objUsuario.token
+              }
+          }).then((resposta) => {
+              return resposta.text();
+          }).then(respostaConvertida => {
+              get_funcionarios();  // Atualiza a tabela após excluir
+              const objResposta = JSON.parse(respostaConvertida);
+              if (objResposta.status == false) {
+                  alert(objResposta.msg);
+              }
+          }).catch(erro => {
+              console.log(erro);
+          });
+      }
+
+      function selecionarFuncionario(funcionario) {
+          txtIFuncionario.value = funcionario.idFuncionario;
+          txtEmailFuncionario.value = funcionario.emailFuncionario;
+      }
+
+      function construirTabela(JSON_FUNCIONARIOS, filtro) {
+          limparTabela();
+
+          for (let funcionario of JSON_FUNCIONARIOS) {
+              let linhaFuncionario = document.createElement("tr");
+
+              const td0 = document.createElement("td");
+              const td1 = document.createElement("td");
+              const td2 = document.createElement("td");
+              const td3 = document.createElement("td");
+              const td4 = document.createElement("td");
+
+              td0.appendChild(document.createTextNode(funcionario.idFuncionario));
+              td1.appendChild(document.createTextNode(funcionario.emailFuncionario));
+
+              const btnSelecionar = document.createElement("button");
+              btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+              td2.appendChild(btnSelecionar);
+              btnSelecionar.onclick = function () {
+                  selecionarFuncionario(funcionario);
+              }
+
+              const btnAtualizar = document.createElement("button");
+              btnAtualizar.appendChild(document.createTextNode("Atualizar"));
+              btnAtualizar.onclick = function () {
+                  update_funcionario();
+              }
+              td3.appendChild(btnAtualizar);
+
+              const btnExcluir = document.createElement("button");
+              btnExcluir.appendChild(document.createTextNode("Excluir"));
+              td4.appendChild(btnExcluir);
+              btnExcluir.onclick = function () {
+                  delete_funcionario(funcionario.idFuncionario);
+              }
+
+              linhaFuncionario.appendChild(td0);
+              linhaFuncionario.appendChild(td1);
+              linhaFuncionario.appendChild(td2);
+              linhaFuncionario.appendChild(td3);
+              linhaFuncionario.appendChild(td4);
+              tabela.appendChild(linhaFuncionario);
+          }
+      }
+
+      function post_funcionarios() {
+          const URI = "http://localhost:5050/funcionario/"
+          const emailFuncionario = txtEmailFuncionario.value;
+          const senhaFuncionario = txtSenhaFuncionario.value;
+
+          const corpo = {
+              "funcionario": {
+                  "emailFuncionario": emailFuncionario,
+                  "senhaFuncionario": senhaFuncionario,
+              }
+          };
+
+          fetch(URI, {
+              method: "POST",
+              body: JSON.stringify(corpo),
+              headers: {
+                  'Authorization': 'Bearer ' + objUsuario.token
+              }
+          }).then((resposta) => {
+              return resposta.text();
+          }).then(respostaConvertida => {
+              get_funcionarios();  // Atualiza a tabela após excluir
+              const objResposta = JSON.parse(respostaConvertida);
+              if (objResposta.status == false) {
+                  alert(objResposta.msg);
+              }
+          }).catch(erro => {
+              console.log(erro);
+          });
+      }
+
+      function get_funcionarios() {
+          const URI = "http://localhost:5050/funcionario/"
+          fetch(URI, {
+              method: "GET",
+              headers: {
+                  'Authorization': 'Bearer ' + objUsuario.token
+              }
+          }).then((resposta) => {
+              return resposta.text();
+          }).then(respostaConvertida => {
+              JSON_FUNCIONARIOS = JSON.parse(respostaConvertida).funcionarios;
+              construirTabela(JSON_FUNCIONARIOS, null);
+          }).catch(erro => {
+              console.log(erro);
+          });
+      }
+  </script>
+</body>
+</html>
