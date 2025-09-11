@@ -21,16 +21,16 @@
     <div class="form-container">
       <div class="caixas-texto">
         <div class="nome-container">
-          <div class="text-nome">Nome do Professor</div>
+          <label for="txtNomeProfessor">Nome do Professor</label>
           <input type="text" id="txtNomeProfessor">
         </div>
       </div>
 
       <div class="caixas-texto">
         <div class="filtro-container">
-          <div class="text-filtro">Filtro</div>
-            <input type="text" id="txtFiltro" placeholder="Digite para filtrar...">
-          </div>
+          <label for="txtFiltro">Filtro</label>
+          <input type="text" id="txtFiltro" placeholder="Digite para filtrar...">
+        </div>
       </div>
     </div>
         
@@ -38,22 +38,7 @@
       <button id="btnCadastrar" class="enviar-button">Cadastrar Professor</button>
     </div>
         
-    <div id="divDados">
-        <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>NOME DO PROFESSOR</th>
-                <th>EXCLUIR</th>
-                <th>SELECIONAR</th>
-                <th>ATUALIZAR</th>
-              </tr>
-            </thead>            
-          <tbody>             
-        </tbody>
-      </table>
-    </div>
-  </div>
+    <div id="divDados"></div>
 
   <script>
 
