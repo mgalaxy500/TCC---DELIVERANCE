@@ -50,7 +50,7 @@
           <a href="alunos.html" class="botao-navegacao">Alunos</a>
           <a href="professor.html" class="botao-navegacao">Professores</a>
           <a href="disciplina.html" class="botao-navegacao">Disciplinas</a>
-          <a href="funcionario.html" class="botao-navegacao">Desenvolvedores</a>
+          <a href="desenvolvedor.html" class="botao-navegacao">Desenvolvedores</a>
           <a href="provaSub.html" class="botao-navegacao">SUB</a>
           <a href="requisicao.html" class="botao-navegacao">Requisições</a>
         </div>
@@ -191,16 +191,14 @@
     function gerarCanhotos() {
       alert('Canhotos gerados com sucesso! (Funcionalidade simulada)');
     }
-  </script>
-
-  <script>
+    
     // Obtem os dados do usuário do localStorage
     const dadosUsuario = localStorage.getItem("dados");
     const objUsuario = JSON.parse(dadosUsuario);
 
     // Exibe o e-mail do usuário no painel
     const div_dados_usuario = document.getElementById("div_dados_usuario");
-    div_dados_usuario.appendChild(document.createTextNode(`Bem-vindo, ${objUsuario.funcionario.emailFuncionario}`));
+    // div_dados_usuario.appendChild(document.createTextNode(`Bem-vindo, ${objUsuario.funcionario.emailFuncionario}`));
   </script>
 </body>
 </html>
