@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "../htdocs/control"
+		},
+		{
+			"path": "../htdocs/docs"
+		},
+		{
+			"path": "../htdocs/middleware"
+		},
+		{
+			"path": "../htdocs/model"
+		},
+		{
+			"path": "../htdocs/router"
+		},
+		{
+			"path": "../htdocs/view"
+		}
+	],
+	"settings": {}
+}

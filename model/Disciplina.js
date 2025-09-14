@@ -5,7 +5,6 @@ class Disciplina {
     constructor() {
         this._idDisciplina = null;
         this._nomeDisciplina = null;
-        this._turmaDisciplina = null;
         this._professor = new Professor();
         this._professor.idProfessor = null;
     }
@@ -15,14 +14,13 @@ class Disciplina {
 
         const SQL = `
             INSERT INTO disciplina
-            (nomeDisciplina, turmaDisciplina, professor_idProfessor)
-            VALUES (?, ?, ?)
+            (nomeDisciplina, professor_idProfessor)
+            VALUES (?, ?)
         `;
 
         try {
             const [result] = await conexao.promise().execute(SQL, [
                 this._nomeDisciplina,
-                this._turmaDisciplina,
                 this._professor.idProfessor
             ]);
             return result.affectedRows === 1;
@@ -40,15 +38,13 @@ class Disciplina {
             if (data.nomeDisciplina && data.nomeDisciplina.length > 5) {
                 const disciplina = new Disciplina();
                 disciplina.nomeDisciplina = data.nomeDisciplina.trim();
-                disciplina.turmaDisciplina = data.turmaDisciplina.trim();
                 disciplina.professor_idProfessor = data.professor_idProfessor || null;
                 console.log(disciplina)
 
                 try {
-                    const SQL = 'INSERT INTO disciplina (nomeDisciplina, turmaDisciplina, professor_idProfessor) VALUES (?, ?, ?);';
+                    const SQL = 'INSERT INTO disciplina (nomeDisciplina, professor_idProfessor) VALUES (?, ?);';
                     const [result] = await conexao.promise().execute(SQL, [
                         disciplina.nomeDisciplina,
-                        disciplina.turmaDisciplina,
                         disciplina.professor_idProfessor
                     ]);
 
@@ -57,7 +53,6 @@ class Disciplina {
                         disciplinasCriadas.push({
                             idDisciplina: disciplina.idDisciplina,
                             nomeDisciplina: disciplina.nomeDisciplina,
-                            turmaDisciplina: disciplina.turmaDisciplina,
                             professor_idProfessor: disciplina.professor_idProfessor
                         });
                     }
@@ -84,12 +79,11 @@ class Disciplina {
 
     async update() {
         const conexao = Banco.getConexao();
-        const SQL = 'UPDATE disciplina SET nomeDisciplina = ?, turmaDisciplina = ?, professor_idProfessor = ? WHERE idDisciplina = ?;';
+        const SQL = 'UPDATE disciplina SET nomeDisciplina = ?, professor_idProfessor = ? WHERE idDisciplina = ?;';
 
         try {
             const [result] = await conexao.promise().execute(SQL, [
                 this._nomeDisciplina,
-                this._turmaDisciplina,
                 this._professor.idProfessor,
                 this._idDisciplina
             ]);
@@ -164,15 +158,6 @@ class Disciplina {
 
     set nomeDisciplina(nomeDisciplina) {
         this._nomeDisciplina = nomeDisciplina;
-        return this;
-    }
-
-    get turmaDisciplina() {
-        return this._turmaDisciplina;
-    }
-
-    set turmaDisciplina(turmaDisciplina) {
-        this._turmaDisciplina = turmaDisciplina;
         return this;
     }
 

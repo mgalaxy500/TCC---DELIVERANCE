@@ -16,7 +16,7 @@ class Professor {
         const SQL = 'INSERT INTO professor (nomeProfessor) VALUES (?);';  // Query SQL para inserir o nome do professor.
 
         try {
-            const [result] = await conexao.promise().execute(SQL, [this._nomeProfessor, this._disciplinaProfessor]);  // Executa a query.
+            const [result] = await conexao.promise().execute(SQL, [this._nomeProfessor]);  // Executa a query.
             this._idProfessor = result.insertId;  // Armazena o ID gerado pelo banco de dados.
             return result.affectedRows > 0;  // Retorna true se a inserção afetou alguma linha.
         } catch (error) {

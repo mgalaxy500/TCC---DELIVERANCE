@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Página de Requerimento</title>
+  <link rel="stylesheet" href="CSS/requirimento.css">
+</head>
+
+<body>
+  <div class="faixa-topo"></div>
+
+  <div class="univap-logo">
+    <img src="Imagens/Univap[Negativo].png" alt="Logo Univap">
+  </div>
+
+  <div class="faixa-base"></div>
+
+  <div class="quadrado-branco">
+
+    <div class="formulario-container">
+      <!-- Coluna 1: Campos de texto -->
+      <div class="caixas-texto">
+        <div class="matricula-container">
+          <p class="text-matricula">N° de matrícula</p>
+          <input type="text" placeholder="Ex: 50230223">
+        </div>
+
+        <div class="disciplina-container">
+          <p class="text-disciplina">Disciplina</p>
+          <select id="disciplina" name="disciplina">
+            <option value="" disabled selected>Selecione</option>
+            <option value="maçã">Matemática</option>
+            <option value="banana">Biologia</option>
+            <option value="laranja">Gramática</option>
+          </select>
+        </div>
+
+        <div class="professor-container">
+          <p class="text-professor">Professor</p>
+          <select id="professor" name="professor">
+            <option value="" disabled selected>Selecione</option>
+            <option value="maçã">Farley</option>
+            <option value="banana">Marta</option>
+            <option value="laranja">Nilson</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Coluna 2: Campos de rádio -->
+      <div class="radio-container">
+        <div class="semana-container">
+          <p class="titulo">Semana:</p>
+          <label><input type="radio" name="opcao-semana" value="g1"> G1</label>
+          <label><input type="radio" name="opcao-semana" value="g2"> G2</label>
+          <label><input type="radio" name="opcao-semana" value="g3"> G3</label>
+        </div>
+
+        <div class="requirimento-container">
+          <p class="titulo">Tipo de requerimento:</p>
+          <label><input type="radio" name="opcao-requerimento" value="atestado"> Atestado</label>
+          <label><input type="radio" name="opcao-requerimento" value="boleto"> Boleto</label>
+          <label><input type="radio" name="opcao-requerimento" value="outro"> Outro</label>
+        </div>
+
+        <div class="prova-container">
+          <p class="titulo">Modelo de prova:</p>
+          <label><input type="radio" name="opcao-prova" value="dissertativa"> Dissertativa</label>
+          <label><input type="radio" name="opcao-prova" value="objetiva"> Objetiva</label>
+        </div>
+      </div>
+
+      <!-- Coluna 3: Data + botão -->
+      <div class="arquivos-barra">
+        <div class="data-container">
+          <p class="text-data">Data da prova</p>
+          <input class="selecionar-data" type="date">
+        </div>
+        <button class="enviar-button" type="button" id="enviarBtn">Enviar</button>
+      </div>
+    </div>
+
+    <!-- Overlay e mensagem de sucesso -->
+    <div class="overlay" id="overlay"></div>
+    <div class="success-message" id="successMessage">
+      Requerimento enviado com sucesso!
+    </div>
+  </div>
+
+  <script>
+    const enviarBtn = document.getElementById('enviarBtn');
+    const overlay = document.getElementById('overlay');
+    const successMessage = document.getElementById('successMessage');
+
+    enviarBtn.onclick = function () {
+      enviarBtn.textContent = 'Enviando...';
+      enviarBtn.disabled = true;
+
+      setTimeout(() => {
+        overlay.style.display = 'block';
+        successMessage.style.display = 'block';
+
+        setTimeout(() => {
+          overlay.style.opacity = '1';
+          overlay.style.visibility = 'visible';
+          successMessage.style.opacity = '1';
+          successMessage.style.transform = 'translate(-50%, -50%) scale(1)';
+        }, 50);
+
+        enviarBtn.textContent = 'Enviar';
+        enviarBtn.disabled = false;
+
+        setTimeout(() => {
+          overlay.style.opacity = '0';
+          overlay.style.visibility = 'hidden';
+          successMessage.style.opacity = '0';
+          successMessage.style.transform = 'translate(-50%, -50%) scale(0.8)';
+
+          setTimeout(() => {
+            overlay.style.display = 'none';
+            successMessage.style.display = 'none';
+          }, 300);
+        }, 3000);
+      }, 1000);
+    };
+
+    overlay.onclick = () => {
+      overlay.style.opacity = '0';
+      overlay.style.visibility = 'hidden';
+      successMessage.style.opacity = '0';
+      successMessage.style.transform = 'translate(-50%, -50%) scale(0.8)';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        successMessage.style.display = 'none';
+      }, 300);
+    };
+  </script>
+</body>
+
+</html>

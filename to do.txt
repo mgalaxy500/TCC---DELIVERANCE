@@ -1,0 +1,5 @@
+-fazer UPDATE de aluno funcionar
+-consertar função de atualizar Disciplina
+-fazer função de criação de Excel
+-fazer função do painel mostrar as requisições de SUB
+-fazer função de criar requisição de SUB funcionar

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Professor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 600px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+        }
+
+        div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td button {
+            padding: 5px 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        td button:hover {
+            background-color: #c82333;
+        }
+
+        #divDados {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <h1>Cadastro de Professor</h1>
+        <div>
+            <label for="txtNomeProfessor">Nome do Professor</label>
+            <input type="text" id="txtNomeProfessor">
+        </div>
+        <div>
+            <label for="txtFiltro">Filtro</label>
+            <input type="text" id="txtFiltro">
+        </div>
+        <div>
+            <button id="btnCadastrar">Cadastrar Professor</button>
+        </div>
+        <div id="divDados"></div>
+    </div>
+
+    <script>
+        let JSON_ESTADOS = {};
+        const dadosLocalStorage = localStorage.getItem("dados");
+        const objUsuario = JSON.parse(dadosLocalStorage);
+
+        const divDados = document.getElementById("divDados");
+        const txtProfessor = document.getElementById("txtNomeProfessor");
+        const txtFiltro = document.getElementById("txtFiltro");
+        txtFiltro.onkeyup = function () {
+            construirTabela(JSON_ESTADOS, txtFiltro.value);
+        }
+        const btnCadastrar = document.getElementById("btnCadastrar");
+
+        const tabela = document.createElement("table");
+
+        divDados.appendChild(tabela);
+        const linha1 = document.createElement("tr");
+        const td0 = document.createElement("th");
+        const td1 = document.createElement("th");
+        const td2 = document.createElement("th");
+        const td3 = document.createElement("th");
+        const td4 = document.createElement("th");
+        td0.appendChild(document.createTextNode("ID"));
+        td1.appendChild(document.createTextNode("NOME DO PROFESSOR"));
+        td2.appendChild(document.createTextNode("EXCLUIR"));
+        td3.appendChild(document.createTextNode("Selecionar"));
+        td4.appendChild(document.createTextNode("Atualizar"));
+        linha1.appendChild(td0);
+        linha1.appendChild(td1);
+        linha1.appendChild(td2);
+        linha1.appendChild(td3);
+        linha1.appendChild(td4);
+
+        get_professors();
+
+        btnCadastrar.onclick = function () {
+            post_professors();
+        }
+
+        function limparTabela() {
+            var qtdLinas = 1;
+            var totalLinhas = tabela.rows.length;
+            for (let i = qtdLinas; i < totalLinhas; i++) {
+                tabela.deleteRow(qtdLinas);
+            }
+
+        }
+        function delete_professor(idProfessor) {
+            const URI = "http://localhost:5050/professor/" + idProfessor;
+            fetch(URI, {
+                method: "DELETE",
+                headers: {
+                    'Authorization': 'Bearer ' + objUsuario.token
+                }
+            }).then((resposta) => {
+                return resposta.text();
+            }).then(respostaConvertida => {
+                get_professors();
+            }).catch(erro => {
+                console.log(erro);
+            })
+        }
+        function construirTabela(objJson, filtro) {
+            limparTabela();
+
+            const professors = objJson.professors;
+
+            tabela.appendChild(linha1);
+            for (let professor of professors) {
+
+                let nomeProfessor = professor.nomeProfessor.toLowerCase();
+                filtro = filtro.toLowerCase();
+                if (!nomeProfessor.includes(filtro)) {
+                    continue;
+                }
+
+                const linha = document.createElement("tr");
+                const btnExcluir = document.createElement("button");
+                btnExcluir.appendChild(document.createTextNode("Excluir"));
+                btnExcluir.onclick = function () {
+                    delete_professor(professor.idProfessor);
+                }
+
+                const txtAlterar = document.createElement("input");
+                txtAlterar.type = 'text';
+                txtAlterar.value = professor.nomeProfessor;
+                txtAlterar.disabled = true;
+
+                const btnSelecionar = document.createElement("button");
+                btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+                btnSelecionar.onclick = function () {
+                    txtAlterar.disabled = false;
+                }
+
+                const btnAtualizar = document.createElement("button");
+                btnAtualizar.appendChild(document.createTextNode("Atualizar"));
+                btnAtualizar.onclick = function () {
+                    const nomeProfessor = txtAlterar.value;
+                    txtAlterar.disabled = true;
+                    put_professors(professor.idProfessor, nomeProfessor);
+                }
+
+                const td0 = document.createElement("td");
+                const td1 = document.createElement("td");
+                const td2 = document.createElement("td");
+                const td3 = document.createElement("td");
+                const td4 = document.createElement("td");
+
+                td0.appendChild(document.createTextNode(professor.idProfessor));
+                td1.appendChild(txtAlterar);
+                td2.appendChild(btnExcluir);
+                td3.appendChild(btnSelecionar);
+                td4.appendChild(btnAtualizar);
+
+                linha.appendChild(td0);
+                linha.appendChild(td1);
+                linha.appendChild(td2);
+                linha.appendChild(td3);
+                linha.appendChild(td4);
+                tabela.appendChild(linha);
+            }
+        }
+
+        function get_professors() {
+            const URI = "http://localhost:5050/professor";
+            fetch(URI, {
+                method: "GET",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + objUsuario.token
+                }
+            }).then((resposta) => {
+                return resposta.text();
+            }).then(respostaConvertida => {
+                JSON_ESTADOS = JSON.parse(respostaConvertida);
+                construirTabela(JSON_ESTADOS, '')
+            }).catch(erro => {
+                console.log(erro);
+            })
+        }
+
+        function put_professors(idProfessor, nomeProfessor) {
+            const URI = "http://localhost:5050/professor/" + idProfessor;
+            if (!nomeProfessor) {
+                alert("O nome do professor não pode ser vazio");
+                return;
+            }
+
+            const objProfessor = { professor: { nomeProfessor: nomeProfessor } };
+
+            fetch(URI, {
+                method: "PUT",
+                body: JSON.stringify(objProfessor),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + objUsuario.token
+                }
+            }).then((resposta) => {
+                return resposta.text();
+            }).then(respostaConvertida => {
+                const obj = JSON.parse(respostaConvertida);
+                if (obj.status == true) {
+                    get_professors();
+                }
+            }).catch(erro => {
+                console.log(erro);
+            })
+        }
+
+        function post_professors() {
+            const URI = "http://localhost:5050/professor";
+            const nomeProfessor = txtProfessor.value;
+            if (!nomeProfessor) {
+                alert("O nome do professor não pode ser vazio");
+                return;
+            }
+
+            const corpo = { 
+                "professor": {
+                    "nomeProfessor": nomeProfessor 
+                } 
+            };
+
+            fetch(URI, {
+                method: "POST",
+                body: JSON.stringify(corpo),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json', 
+                    'Authorization': 'Bearer ' + objUsuario.token
+                }
+            }).then((resposta) => {
+                return resposta.text();
+            }).then(respostaConvertida => {
+                const obj = JSON.parse(respostaConvertida);
+                if (obj.status == true) {
+                    get_professors();
+                }
+            }).catch(erro => {
+                console.log(erro);
+            })
+        }
+        
+    </script>
+
+</body>
+
+</html>

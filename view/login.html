@@ -5,147 +5,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        #login-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 24px;
-            color: #333;
-        }
-
-        div {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #218838;
-        }
-
-        #divResposta {
-            color: red;
-            text-align: center;
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="CSS/login.css">    
 </head>
 
 <body>
-    <div id="login-container">
-        <h1>Login</h1>
-        <div>
-            <label for="txtEmail">Email:</label>
-            <input type="email" id="txtEmail" value=''>
+    <div class="faixa-topo"></div>
+        <div class="univap-logo">
+          <img src="Imagens/Univap[Negativo].png" alt="Logo Univap">
         </div>
-        <div>
-            <label for="txtSenha">Senha:</label>
-            <input type="password" id="txtSenha" value="">
-        </div>
-        <div>
-            <button id="btnLogin">Fazer Login</button>
-        </div>
-        <div id="divResposta"></div>
+      <div class="faixa-base"></div>
+
+      <div class="login-text">
+        <p>Login</p>
+      </div>
+
+      <div class="email-barra">
+        <input type="email" id="txtEmail" value='' placeholder="Email">
+      </div>
+
+    <div class="senha-barra">
+      <input type="password" id="txtSenha" value="" placeholder="Senha">
     </div>
 
-    <script>
-        const btnLogin = document.getElementById('btnLogin');
-        const txtEmailFuncionario = document.getElementById("txtEmail");
-        const txtSenhaFuncionario = document.getElementById("txtSenha");
-        const divResposta = document.getElementById("divResposta");
+    <div class="red-button">
+      <button class="login-button" id="btnLogin">Login</button>
+    </div>
 
-        btnLogin.onclick = function () {
-            fazerLogin();
-        }
+    <div id="divResposta"></div>
 
-        function fazerLogin() {
-            const emailFuncionario = txtEmailFuncionario.value;
-            const senhaFuncionario = txtSenhaFuncionario.value;
+<script>
+  const btnLogin = document.getElementById('btnLogin');
+  const txtEmailFuncionario = document.getElementById("txtEmail");
+  const txtSenhaFuncionario = document.getElementById("txtSenha");
+  const divResposta = document.getElementById("divResposta");
 
-            const obj_json = {
-                funcionario: {
-                    emailFuncionario: emailFuncionario,
-                    senhaFuncionario: senhaFuncionario
-                }
-            };
-            
-            const uri = 'http://localhost:5050/login'; // Certifique-se de que este é o URL correto
+  btnLogin.onclick = function () {
+    fazerLogin();
+  }
 
-            fetch(uri, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(obj_json)
-            })
-            .then((resposta_backEnd) => {
-                return resposta_backEnd.text();
-            })
-            .then((texto_resposta_back) => {
-                console.log(texto_resposta_back);
-                processarResultados(texto_resposta_back);
-            })
-            .catch((error) => {
-                console.log(error);
-            })
-        }
+  function fazerLogin() {
+    const emailFuncionario = txtEmailFuncionario.value;
+    const senhaFuncionario = txtSenhaFuncionario.value;
 
-        function processarResultados(texto_json) {
-            try {
-                const obj_json = JSON.parse(texto_json);
+    const obj_json = {
+      funcionario: {
+      emailFuncionario: emailFuncionario,
+      senhaFuncionario: senhaFuncionario
+      }
+    };
+      
+    const uri = 'http://localhost:5050/login'; // Certifique-se de que este é o URL correto
 
-                if (obj_json.status === false) {
-                    divResposta.textContent = "Usuário ou senha inválida";
-                } else {
-                    alert("Bem-Vindo!");
-                    localStorage.setItem("dados", texto_json);
-                    window.location.href = 'painel.html';
-                }
-            } catch (e) {
-                console.error("Erro ao processar o JSON: ", e);
-            }
-        }
-    </script>
+    fetch(uri, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(obj_json)
+    })
+    .then((resposta_backEnd) => {
+      return resposta_backEnd.text();
+    })
+    .then((texto_resposta_back) => {
+      console.log(texto_resposta_back);
+      processarResultados(texto_resposta_back);
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+  }
+
+  function processarResultados(texto_json) {
+    try {
+      const obj_json = JSON.parse(texto_json);
+
+      if (obj_json.status === false) {
+          alert('Usuário ou senha inválida');
+      } else {
+          // alert("Bem-Vindo!");
+          localStorage.setItem("dados", texto_json);
+          window.location.href = 'painel.html';
+      }
+    } catch (e) {
+      console.error("Erro ao processar o JSON: ", e);
+    }
+  }
+</script>
 </body>
-
 </html>

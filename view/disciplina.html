@@ -2,185 +2,190 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 115vh;
-            margin: 0;
-        }
-
-        #container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 1125px;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 24px;
-            color: #333;
-        }
-
-        div {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        td button {
-            padding: 5px 10px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        td button:hover {
-            background-color: #c82333;
-        }
-
-        #divDados {
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Disciplina</title>
+  <link rel="stylesheet" href="CSS/disciplina.css">
 </head>
 
 <body>
-    <div id="container">
-        <h1>Cadastro de Disciplina</h1>
-        
-        <div>
-            <label for="txtNomeDisciplina">Nome da Disciplina</label>
-            <input type="text" id="txtNomeDisciplina">
+
+  <div class="faixa-topo">
+    <div class="univap-logo">
+        <img src="Imagens/Univap[Negativo].png" alt="Logo Univap" />
+    </div>
+    <div class="faixa-base"></div>
+  </div>
+  
+  <div id="container">
+    <h1>Cadastro de Disciplina</h1>    
+      <div class="form-container">          
+        <div class="caixas-texto">
+          <div class="id-container">
+            <div class="text-id">ID da Disciplina</div>
+            <input type="text" id="txtIDisciplina">
+          </div>
         </div>
-        
-        
-        <div>
-            <label for="txtTurmaDisciplina">Turma da Disciplina</label>
-            <input type="text" id="txtTurmaDisciplina">
+          
+        <div class="caixas-texto">
+          <div class="nome-container">
+            <div class="text-nome">Nome da Disciplina</div>
+            <input type="text" id="txtNomeDisciplina">
+          </div>
         </div>
 
-        <div>
-            <label for="cboProfessor">Professor da Disciplina</label>
-            <select id="cboProfessor"></select>
+        <div class="caixas-texto">
+          <div class="professor-container">
+            <div class="text-professor">Professor da Disciplina</div>
+            <select id="cboProfessors">
+              <option value="">Selecione um professor...</option>
+            </select>
+          </div>
         </div>
-        
-        <div>
-            <label for="txtFiltro">Filtro</label>
-            <input type="text" id="txtFiltro">
+
+        <div class="caixas-texto">
+          <div class="filtro-container">
+            <div class="text-filtro">Filtro</div>
+            <input type="text" id="txtFiltro" placeholder="Digite para filtrar...">
+          </div>
         </div>
-        
-        <div>
-            <button id="btnCadastrar">Cadastrar Disciplina</button>
-        </div>
-        
-        <div id="divDados"></div>
-    </div>
+      </div>
+
+      <div class="button-container">
+        <button id="btnCadastrar" class="enviar-button">Cadastrar Disciplina</button>
+      </div>
+
+      <div id="divDados">
+   </div>
 </body>
+
 <script>
-    let JSON_PROFESSORES = [];
+    let JSON_PROFESSORES = {};
     let JSON_DISCIPLINAS = {};
     const dadosLocalStorage = localStorage.getItem("dados");
     const objUsuario = JSON.parse(dadosLocalStorage);
 
     const divDados = document.getElementById("divDados");
     const txtFiltro = document.getElementById("txtFiltro");
-    const txtNomeDisciplina = document.getElementById("txtNomeDisciplina");
-    const txtTurmaDisciplina = document.getElementById("txtTurmaDisciplina");
-    const cboProfessor = document.getElementById("cboProfessor");
-    const btnCadastrar = document.getElementById("btnCadastrar");
     const txtIDisciplina = document.getElementById("txtIDisciplina");
+    const txtNomeDisciplina = document.getElementById("txtNomeDisciplina");
+    const cboProfessores = document.getElementById("cboProfessores");
+    const btnCadastrar = document.getElementById("btnCadastrar");
 
     // Evento de filtro para buscar disciplinas
     txtFiltro.onkeyup = function () {
         construirTabela(JSON_DISCIPLINAS, txtFiltro.value);
-    };
+    }
 
     // Criação da tabela
     const tabela = document.createElement("table");
     divDados.appendChild(tabela);
+    
     const linhaCabecalho = document.createElement("tr");
-    ["Nome da Disciplina", "Turma da Disciplina", "Professor da Disciplina", "Excluir", "Selecionar", "Atualizar"]
-        .forEach(texto => {
-            const th = document.createElement("th");
-            th.textContent = texto;
-            linhaCabecalho.appendChild(th);
-        });
+    const thID = document.createElement("th");
+    const thNome = document.createElement("th");
+    const thProfessor= document.createElement("th");
+    const thExcluir = document.createElement("th");
+    const thSelecionar = document.createElement("th");
+    const thAtualizar = document.createElement("th");
+
+    // Cabeçalhos da tabela
+    thID.appendChild(document.createTextNode("ID"));
+    thNome.appendChild(document.createTextNode("Nome da Disciplina"));
+    thProfessor.appendChild(document.createTextNode("Professor da Disciplina"));
+    thExcluir.appendChild(document.createTextNode("Excluir"));
+    thSelecionar.appendChild(document.createTextNode("Selecionar"));
+    thAtualizar.appendChild(document.createTextNode("Atualizar"));
+
+    // Adiciona cabeçalhos à linha
+    linhaCabecalho.appendChild(thID);
+    linhaCabecalho.appendChild(thNome);
+    linhaCabecalho.appendChild(thProfessor);
+    linhaCabecalho.appendChild(thExcluir);
+    linhaCabecalho.appendChild(thSelecionar);
+    linhaCabecalho.appendChild(thAtualizar);
     tabela.appendChild(linhaCabecalho);
 
-    // Inicializações
-    get_disciplinas();
     get_professors();
+    get_disciplinas();
 
     btnCadastrar.onclick = function () {
         post_disciplinas();
-    };
+    }
 
     function limparTabela() {
-        while (tabela.rows.length > 1) {
-            tabela.deleteRow(1);
+        var qtdLinas = 1;
+        var totalLinhas = tabela.rows.length;
+        for (let i = qtdLinas; i < totalLinhas; i++) {
+            tabela.deleteRow(qtdLinas);
         }
+    }
+
+    function get_professors() {
+        const URI = "http://localhost:5050/professor/"
+        console.log(URI);
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            //console.log(respostaConvertida);
+            JSON_PROFESSORES = JSON.parse(respostaConvertida);
+            JSON_PROFESSORES = JSON_PROFESSORES.professors;
+            montarCombo1();
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+    function get_disciplinas() {
+        const URI = "http://localhost:5050/disciplina";
+        console.log(URI);
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            JSON_DISCIPLINAS = JSON.parse(respostaConvertida);
+            JSON_DISCIPLINAS = JSON_DISCIPLINAS.disciplinas;
+            construirTabela(JSON_DISCIPLINAS, '');
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+    
+
+    function delete_disciplina(idDisciplina) {
+        const URI = "http://localhost:5050/disciplina/" + idDisciplina;
+        console.log(URI);
+        fetch(URI, {
+            method: "DELETE",
+            headers: {
+
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_disciplinas();
+        }).catch(erro => {
+            console.log(erro);
+        })
     }
 
     function construirTabela(JSON_DISCIPLINAS, filtro) {
         limparTabela();
-
-        const disciplina = JSON_DISCIPLINAS.disciplina;
         for (let disciplina of JSON_DISCIPLINAS) {
-
             let nomeDisciplina = disciplina.nomeDisciplina.toLowerCase();
             filtro = filtro.toLowerCase();
             if (!nomeDisciplina.includes(filtro)) {
@@ -188,80 +193,44 @@
             }
             const linha = document.createElement("tr");
 
-            const txtAlterarNome = document.createElement("input");
-            txtAlterarNome.type = 'text';
-            txtAlterarNome.value = disciplina.nomeDisciplina;
-            txtAlterarNome.disabled = true;
-
-            const txtAlterarTurma = document.createElement("input");
-            txtAlterarTurma.type = 'text';
-            txtAlterarTurma.value = disciplina.turmaDisciplina;
-            txtAlterarTurma.disabled = true;
-
-            const cboAlterarProfessor = document.createElement("select");
-            cboAlterarProfessor.disabled = true;
-            for (let professor of JSON_PROFESSORES) {
-                const nomeProfessor = professor.nomeProfessor;
-                const idProfessor = professor.idProfessor;
-
-                const option = document.createElement("option");
-                option.value = idProfessor;
-                option.text = nomeProfessor;
-
-                // Se a turma da disciplina for igual, marca como selecionada
-                if (professor.idProfessor === disciplina.professor_idProfessor) {
-                    option.selected = true;
-                }
-
-                cboAlterarProfessor.appendChild(option);
-            }
-
             const btnExcluir = document.createElement("button");
             btnExcluir.appendChild(document.createTextNode("Excluir"));
             btnExcluir.onclick = function () {
-                const idDisciplina = disciplina.idDisciplina;
-                delete_disciplina(idDisciplina);
+                delete_disciplina(disciplina.idDisciplina);
             }
 
             const btnSelecionar = document.createElement("button");
-                btnSelecionar.textContent = "Selecionar";
-                btnSelecionar.onclick = () => { txtAlterarNome.disabled = false; txtAlterarTurma.disabled = false; cboAlterarProfessor.disabled = false; }
+            btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+            btnSelecionar.onclick = function () {
+                selecionarDisciplina(disciplina);
+            }
 
             const btnAtualizar = document.createElement("button");
             btnAtualizar.appendChild(document.createTextNode("Atualizar"));
-            btnAtualizar.onclick = () => {
-                    const nomeDisciplina = txtAlterarNome.value;
-                    const turmaDisciplina = txtAlterarTurma.value;
-                    const professor_idProfessor = cboAlterarProfessor.value;
-                    txtAlterarNome.disabled = true;
-                    txtAlterarTurma.disabled = true;
-                    cboAlterarProfessor.disabled = true;
-                    console.log(nomeDisciplina)
-                    put_disciplina(disciplina.idDisciplina, nomeDisciplina, turmaDisciplina, professor_idProfessor);
-            };
+            btnAtualizar.onclick = function () {
+                update_disciplina();
+            }
 
+            const tdID = document.createElement("td");
             const tdNome = document.createElement("td");
-            const tdTurma = document.createElement("td");
             const tdProfessor = document.createElement("td");
             const tdExcluir = document.createElement("td");
             const tdSelecionar = document.createElement("td");
             const tdAtualizar = document.createElement("td");
 
-            tdTurma.appendChild(txtAlterarTurma);
-            tdNome.appendChild(txtAlterarNome);
-            // Encontrar o professor pelo ID
-            const professor = JSON_PROFESSORES.find(p => p.idProfessor == disciplina.professor_idProfessor);
+            // 🔹 Corrigido: pega o nome do professor pelo ID
+            let professor = JSON_PROFESSORES.find(p => p.idProfessor == disciplina.professor_idProfessor);
+            let nomeProfessor = professor ? professor.nomeProfessor : "Professor não encontrado";
 
-            // Se encontrar, usa o nome; senão escreve 'Desconhecido'
-            const nomeProfessor = professor ? professor.nomeProfessor : 'Desconhecido';
-
-            tdProfessor.appendChild(document.createTextNode(nomeProfessor));
+            tdID.appendChild(document.createTextNode(disciplina.idDisciplina));
+            tdNome.appendChild(document.createTextNode(disciplina.nomeDisciplina));
+            tdProfessor.appendChild(document.createTextNode(nomeProfessor)); // ⚠️ aqui estava errado
             tdExcluir.appendChild(btnExcluir);
             tdSelecionar.appendChild(btnSelecionar);
             tdAtualizar.appendChild(btnAtualizar);
 
+            linha.appendChild(tdID);
             linha.appendChild(tdNome);
-            linha.appendChild(tdTurma);
             linha.appendChild(tdProfessor);
             linha.appendChild(tdExcluir);
             linha.appendChild(tdSelecionar);
@@ -270,115 +239,18 @@
         }
     }
 
-    function get_disciplinas() {
-        fetch("http://localhost:5050/disciplina", {
-            method: "GET",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + objUsuario.token
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            JSON_DISCIPLINAS = data.disciplinas;
-            construirTabela(JSON_DISCIPLINAS, '');
-        })
-        .catch(console.error);
-    }
+    
 
-    function get_professors() {
-        fetch("http://localhost:5050/professor/", {
-            method: "GET",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + objUsuario.token
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            JSON_PROFESSORES = data.professors;
-            montarComboProfessores();
-        })
-        .catch(console.error);
-    }
+    function update_disciplina() {
 
-    function get_professorsById(idProfessor) {
-        fetch("http://localhost:5050/professor/" + idProfessor, {
-            method: "GET",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + objUsuario.token
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            JSON_PROFESSORES_ID = data.professorsId;
-            montarComboProfessores();
-        })
-        .catch(console.error);
-    }
-
-    function montarComboProfessores() {
-        for (let professor of JSON_PROFESSORES) {
-            const nomeProfessor = professor.nomeProfessor;
-            const idProfessor = professor.idProfessor;
-            const option = document.createElement("option");
-            option.value = idProfessor;
-            option.text = nomeProfessor;
-            cboProfessor.appendChild(option);
-        }
-    }
-
-    function post_disciplinas() {
-        const nomeDisciplina = txtNomeDisciplina.value.trim();
-        const turmaDisciplina = txtTurmaDisciplina.value.trim();
-        const idProfessor = cboProfessor.value;
-
-        if (!nomeDisciplina || !turmaDisciplina || !idProfessor) {
-            alert("Por favor, preencha todos os campos.");
-            return;
-        }
-
-        const corpo = {
-            "disciplina": {
-                "nomeDisciplina" : nomeDisciplina,
-                "turmaDisciplina" : turmaDisciplina,
-                "professor_idProfessor" : idProfessor
-            }
-        };
-        fetch("http://localhost:5050/disciplina/", {
-            method: "POST",
-            body: JSON.stringify(corpo),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json', 
-                'Authorization': 'Bearer ' + objUsuario.token
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (!data.status) {
-                alert(data.msg);
-            }
-            limparCampos();
-            get_disciplinas();
-            this._nomeDisciplina,
-            this._turmaDisciplina,
-            this._professor.idProfessor
-        })
-        .catch(console.error);
-    }
-
-    function put_disciplina(idDisciplina, nomeDisciplina, turmaDisciplina, idProfessor) {
+        const id = txtIDisciplina.value;
+        const nomeDisciplina = txtNomeDisciplina.value;
+        const idProfessor = cboProfessors.value;
 
         const corpo = {
             "disciplina": {
                 "nomeDisciplina": nomeDisciplina,
-                "turmaDisciplina": turmaDisciplina,
-                "professor_idProfessor": idProfessor
+                "professor_idProfessor": idProfessor,
             }
         };
 
@@ -387,13 +259,109 @@
             return;
         }
 
-        const URI = "http://localhost:5050/disciplina/"+ idDisciplina;
+        const URI = "http://localhost:5050/disciplina/"+id;
         fetch(URI, {
             method: "PUT",
             body: JSON.stringify(corpo),
             headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_disciplinas();
+            const objResposta = JSON.parse(respostaConvertida);
+            if (objResposta.status == false) {
+                alert(objResposta.msg);
+            }
+
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+    
+
+    function selecionarDisciplina(disciplina) {
+        document.getElementById("txtIDisciplina").value = disciplina.idDisciplina || "";
+        document.getElementById("txtNomeDisciplina").value = disciplina.nomeDisciplina || "";
+        document.getElementById("cboProfessors").value = disciplina.professor_idProfessor || "";
+    }
+
+
+    function put_disciplinas(idDisciplina,nomeDisciplina) {
+        const URI = "http://localhost:5050/disciplina/" + idDisciplina;
+        if (nomeDisciplina == "") {
+            alert("o nome do disciplina não pode ser vazio");
+            return;
+        }
+
+        const objDisciplina = {
+            disciplina: {
+                nomeDisciplina: nomeDisciplina
+            }
+        }
+
+        fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(objDisciplina),
+            headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json', // <-- ESSENCIAL!
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_disciplinas();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+    function montarCombo1() {
+        for (let professor of JSON_PROFESSORES) {
+            const nomeProfessor = professor.nomeProfessor;
+            const idProfessor = professor.idProfessor;
+            const option = document.createElement("option");
+            option.value = idProfessor;
+            option.text = nomeProfessor;
+            cboProfessors.appendChild(option);
+        }
+    }
+
+    function post_disciplinas() {
+        const URI = "http://localhost:5050/disciplina/";
+        console.log(URI);
+
+        const nomeDisciplina = txtNomeDisciplina.value;
+        const idProfessor = cboProfessors.value;
+
+        if (!nomeDisciplina || !idProfessor) {
+            alert("Por favor, preencha todos os campos.");
+            return;
+        }
+
+        const corpo = {
+            "disciplina":{
+                "nomeDisciplina": nomeDisciplina,
+                "professor_idProfessor": idProfessor,
+            }
+        };
+        console.log(corpo);
+
+        fetch(URI, {
+            method: "POST",
+            body: JSON.stringify(corpo),
+            headers: {
+                'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + objUsuario.token
             }
         }).then((resposta) => {
@@ -412,23 +380,22 @@
     }
 
     function delete_disciplina(idDisciplina) {
-        fetch("http://localhost:5050/disciplina/" + idDisciplina, {
+        const URI = "http://localhost:5050/disciplina/" + idDisciplina;
+        console.log(URI);
+        fetch(URI, {
             method: "DELETE",
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json', // <-- ESSENCIAL!
+                'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + objUsuario.token
             }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_disciplinas();
+        }).catch(erro => {
+            console.log(erro);
         })
-        .then(res => res.text())
-        .then(() => get_disciplinas())
-        .catch(console.error);
-    }
-
-    function limparCampos() {
-        txtNomeDisciplina.value = "";
-        txtTurmaDisciplina.value = "";
-        cboProfessor.selectedIndex = 0;
     }
 </script>
 </html>

@@ -2,133 +2,83 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 115vh;
-            margin: 0;
-        }
-
-        #container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 1125px;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 24px;
-            color: #333;
-        }
-
-        div {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        td button {
-            padding: 5px 10px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        td button:hover {
-            background-color: #c82333;
-        }
-
-        #divDados {
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de ProvaSub</title>
+  <link rel="stylesheet" href="CSS/provaSub.css">
 </head>
 
+
 <body>
-    <div id="container">
-        <h1>Cadastro de ProvaSub</h1>
-        
-        <div>
-            <label for="txtIProvaSub">ID da ProvaSub</label>
-            <input type="text" id="txtIProvaSub">
-        </div>
-        
-        <div>
-            <label for="cboAlunos">Aluno da ProvaSub</label>
-            <select id="cboAlunos"></select>
-        </div>
-        
-        <div>
-            <label for="cboDisciplinas">Disciplina da ProvaSub</label>
-            <select id="cboDisciplinas"></select>
-        </div>
-        
-        <div>
-            <label for="txtFiltro">Filtro</label>
-            <input type="text" id="txtFiltro">
-        </div>
-        
-        <div>
-            <button id="btnCadastrar">Cadastrar ProvaSub</button>
-        </div>
-        
-        <div id="divDados"></div>
+
+  <div class="faixa-topo">
+    <div class="univap-logo">
+        <img src="Imagens/Univap[Negativo].png" alt="Logo Univap" />
     </div>
+    <div class="faixa-base"></div>
+  </div>
+
+  <div id="container">
+    <h1>Cadastro de ProvaSub</h1>
+   
+    <div class="form-container">
+      <div class="caixas-texto">
+        <div class="id-container">
+          <div class="text-id">ID da ProvaSub</div>
+          <input type="text" id="txtIProvaSub">
+        </div>
+      </div>
+          
+      <div class="caixas-texto">
+        <div class="aluno-container">
+          <div class="text-aluno">Aluno da ProvaSub</div>
+          <select id="cboAlunos">
+            <option value="">Selecione um aluno...</option>
+          </select>
+        </div>
+      </div>
+            
+      <div class="caixas-texto">
+        <div class="disciplina-container">
+          <div class="text-disciplina">Disciplina da ProvaSub</div>
+          <select id="cboDisciplinas">
+            <option value="">Selecione uma disciplina...</option>        
+          </select>
+        </div>
+      </div>
+            
+         
+      <div class="caixas-texto">
+        <div class="filtro-container">
+          <div class="text-filtro">Filtro</div>
+          <input type="text" id="txtFiltro" placeholder="Digite para filtrar...">
+        </div>
+      </div>
+    </div>
+
+    <div class="button-container">
+        <button id="btnCadastrar" class="enviar-button">Cadastrar ProvaSub</button>
+    </div>
+        
+    <div id="divDados">
+      <table>
+          <thead>
+              <tr>
+                <th>ID</th>
+                <th>Aluno</th>
+                <th>Disciplina</th>
+                <th>Excluir</th>
+                <th>Selecionar</th>
+                <th>Atualizar</th>
+                </tr>
+            </thead>
+          <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </body>
+
 <script>
     let JSON_PROFESSORES = {};
     let JSON_JOGOS = {};
