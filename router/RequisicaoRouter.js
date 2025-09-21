@@ -21,12 +21,7 @@ module.exports = class RequisicaoRouter {
     createRoutes() {
         const multer = require('multer');
         const upload = multer({ dest: 'uploads/' }); // Configura o multer para armazenar os arquivos na pasta 'uploads'
-        this.router.post('/csv',
-            this.jwtMiddleware.validate,
-            upload.single('variavelArquivo'),//nome da variavel definida no javascript ou no insominia
-            this.RequisicaoControl.createByCSV
-        );
-
+    
         this.router.get('/',
             this.jwtMiddleware.validate,
             this.RequisicaoControl.readAll
@@ -39,8 +34,8 @@ module.exports = class RequisicaoRouter {
 
         this.router.post('/',
             this.jwtMiddleware.validate,
-            this.RequisicaoMiddleware.validate_codigoComprovanteRequisicao,
-            this.RequisicaoMiddleware.isNotCodigo,
+            this.RequisicaoMiddleware.validar_MatriculaAluno,
+            this.RequisicaoMiddleware.validar_DataProva,
             this.RequisicaoControl.create
         );
 

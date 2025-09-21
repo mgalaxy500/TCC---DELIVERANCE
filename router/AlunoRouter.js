@@ -23,7 +23,7 @@ module.exports = class AlunoRouter {
             this.alunoControl.readAll
         );
 
-        this.router.get('/:idAluno',
+        this.router.get('/:matriculaAluno',
             this.jwtMiddleware.validate
         );
 
@@ -34,12 +34,12 @@ module.exports = class AlunoRouter {
             this.alunoControl.create
         );
 
-        this.router.delete('/:idAluno',
+        this.router.delete('/:matriculaAluno',
             this.jwtMiddleware.validate,
             this.alunoControl.delete
         );
 
-        this.router.put('/:idAluno',
+        this.router.put('/:matriculaAluno',
             this.jwtMiddleware.validate,
             this.alunoControl.update
         );

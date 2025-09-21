@@ -18,6 +18,10 @@ body {
   width: 230px;
 }
 
+select:invalid {
+  color: #888;
+}
+
 .faixa-base {
   background-color: rgb(27, 54, 93);
   height: 120px;

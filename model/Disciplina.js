@@ -78,6 +78,7 @@ class Disciplina {
     }
 
     async update() {
+        console.log('Atualizando:', this._nomeDisciplina, this._professor.idProfessor, this._idDisciplina);
         const conexao = Banco.getConexao();
         const SQL = 'UPDATE disciplina SET nomeDisciplina = ?, professor_idProfessor = ? WHERE idDisciplina = ?;';
 

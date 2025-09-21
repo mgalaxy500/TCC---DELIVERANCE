@@ -12,8 +12,8 @@ module.exports = class AlunoControl {
         // Cria uma nova instância do modelo Aluno.
         var aluno = new Aluno();
         // Atribui o nome do aluno passado no corpo da requisição (request body) à instância criada.
-        aluno.nomeAluno = request.body.aluno.nomeAluno;
         aluno.matriculaAluno = request.body.aluno.matriculaAluno;
+        aluno.nomeAluno = request.body.aluno.nomeAluno;
         aluno.turmaAluno = request.body.aluno.turmaAluno;
         // Chama o método create() do modelo Aluno para inserir o novo aluno no banco de dados.
         const isCreated = await aluno.create();
@@ -76,7 +76,7 @@ module.exports = class AlunoControl {
         // Cria uma nova instância do modelo Aluno.
         var aluno = new Aluno();
         // Atribui o ID do aluno passado como parâmetro na URL (request params) à instância criada.
-        aluno.idAluno = request.params.idAluno;
+        aluno.matriculaAluno = request.params.matriculaAluno
         // Chama o método delete() do modelo Aluno para excluir o aluno do banco de dados.
         const isDeleted = await aluno.delete();
         // Cria um objeto de resposta com o código, status e a mensagem de sucesso ou erro.
@@ -94,8 +94,9 @@ module.exports = class AlunoControl {
         // Cria uma nova instância do modelo Aluno.
         var aluno = new Aluno();
         // Atribui o ID e o nome do aluno passados na URL e no corpo da requisição, respectivamente.
-        aluno.idAluno = request.params.idAluno;
+        aluno.matriculaAluno = request.params.matriculaAluno;
         aluno.nomeAluno = request.body.aluno.nomeAluno;
+        aluno.turmaAluno = request.body.aluno.turmaAluno;
         // Chama o método update() do modelo Aluno para atualizar o aluno no banco de dados.
         const isUpdated = await aluno.update();
         // Cria um objeto de resposta com o código, status e a mensagem de sucesso ou erro.
@@ -130,7 +131,7 @@ module.exports = class AlunoControl {
         // Cria uma nova instância do modelo Aluno.
         var aluno = new Aluno();
         // Atribui o ID do aluno passado como parâmetro na URL (request params) à instância criada.
-        aluno.idAluno = request.params.idAluno;
+        aluno.matriculaAluno = request.params.matriculaAluno;
 
         // Chama o método readByID() para buscar o aluno pelo ID no banco de dados.
         const resultado = await aluno.readByID();

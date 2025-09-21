@@ -5,37 +5,58 @@ const Aluno = require('./Aluno');
 class Requisicao {
     // Construtor da classe Requisicao que inicializa as propriedades.
     constructor() {
-        this._idRequisicao = null;  // ID do requisicao, inicialmente nulo.
-        this._tipoRequisicao = null;  // Nome do requisicao.
-        this._dataRequisicao = null;  // Nome do requisicao.
-        this._codigoComprovanteRequisicao = null;  // ID do gênero associado.
-        this._aluno = new Aluno();  // ID do aluno associado.
+        this._idRequisicao = null;
+        this._justRequisicao = null;
+        this._dataRequisicao = null;
+        this._codigoComprovanteRequisicao = null;
+        this._aluno = new Aluno();
+
+        // Novos campos
+        this._idProfessor = null;
+        this._idDisciplina = null;
+        this._justRequisicao = null;
+        this._gNRequisicao = null;
+        this._modeloRequisicao = null;
+        this._statusRequisicao = null; // 0 = Aprovado, 1 = Pendente, 2 = Rejeitado
+        this._matriculaAluno = null;
     }
 
     // Método assíncrono para criar um novo requisicao no banco de dados.
     async create() {
-        const conexao = Banco.getConexao();
-        const SQL = 'INSERT INTO requisicao (tipoRequisicao, dataRequisicao, codigoComprovanteRequisicao, aluno_idAluno) VALUES (?, ?, ?, ?);';
+    const conexao = Banco.getConexao();
+    const SQL = `
+        INSERT INTO requisicao 
+        (aluno_matriculaAluno, professor_idProfessor, disciplina_idDisciplina, justRequisicao, dataRequisicao, gNRequisicao, modeloRequisicao, statusRequisicao)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+    `;
 
-        try {
-            const [result] = await conexao.promise().execute(SQL, [
-                this._tipoRequisicao, this._dataRequisicao, this._codigoComprovanteRequisicao,this._aluno.idAluno
-            ]);
-            this._idRequisicao = result.insertId;  // Armazena o ID gerado pelo banco de dados.
-            return result.affectedRows > 0;  // Retorna true se a inserção foi bem-sucedida.
-        } catch (error) {
-            console.error('Erro ao criar o requisicao:', error);
-            return false;
-        }
+    try {
+        const [result] = await conexao.promise().execute(SQL, [
+            this._matriculaAluno,         // aluno_matriculaAluno
+            this._idProfessor,            // professor_idProfessor
+            this._idDisciplina,           // disciplina_idDisciplina
+            this._justRequisicao, // justRequisicao
+            this._dataRequisicao,         // dataRequisicao
+            this._gNRequisicao,           // gNRequisicao
+            this._modeloRequisicao,       // modeloRequisicao
+            this._statusRequisicao        // statusRequisicao
+        ]);
+        this._idRequisicao = result.insertId;
+        return result.affectedRows > 0;
+    } catch (error) {
+        console.error('Erro ao criar o requisicao:', error);
+        return false;
     }
+}
 
     // Método assíncrono para excluir um requisicao do banco de dados.
     async delete() {
+        console.log('Deletando:', this._idRequisicao);
         const conexao = Banco.getConexao();
         const SQL = 'DELETE FROM requisicao WHERE idRequisicao = ?;';
 
         try {
-            const [result] = await conexao.promise().execute(SQL, [this._idRequisicao, this._tipoRequisicao, this._dataRequisicao, this._codigoComprovanteRequisicao,this._aluno.idAluno]);
+            const [result] = await conexao.promise().execute(SQL, [this._idRequisicao]);
             return result.affectedRows > 0;
         } catch (error) {
             console.error('Erro ao excluir o requisicao:', error);
@@ -45,12 +66,13 @@ class Requisicao {
 
     // Método assíncrono para atualizar os dados de um requisicao no banco de dados.
     async update() {
+        console.log('Atualizando:', this._statusRequisicao, this._idRequisicao);
         const conexao = Banco.getConexao();
-        const SQL = 'UPDATE requisicao SET tipoRequisicao, dataRequisicao, codigoComprovanteRequisicao, aluno_idAluno = ? WHERE idRequisicao = ?;';
-
+        const SQL = 'UPDATE requisicao SET statusRequisicao = ? WHERE idRequisicao = ?;';
         try {
             const [result] = await conexao.promise().execute(SQL, [
-                this._tipoRequisicao, this._dataRequisicao, this._codigoComprovanteRequisicao,this._aluno.idAluno
+                this._statusRequisicao,
+                this._idRequisicao
             ]);
             return result.affectedRows > 0;
         } catch (error) {
@@ -62,7 +84,10 @@ class Requisicao {
     // Método assíncrono para ler todos os requisicaos do banco de dados.
     async readAll() {
         const conexao = Banco.getConexao();
-        const SQL = 'SELECT * FROM requisicao JOIN ON requisicao_idRequisicao = idRequisicao JOIN aluno ON aluno_idAluno = idAluno ORDER BY nomeRequisicao;';
+        const SQL = `SELECT * 
+            FROM requisicao
+            JOIN aluno ON requisicao.aluno_matriculaAluno = aluno.matriculaAluno
+            ORDER BY requisicao.idRequisicao;`;
         try {
             const [rows] = await conexao.promise().execute(SQL);
             return rows;
@@ -87,41 +112,33 @@ class Requisicao {
         }
     }
 
-    
+    // Getters e setters para os novos campos
+    get idRequisicao() { return this._idRequisicao; }
+    set idRequisicao(value) { this._idRequisicao = value; }
 
-    // Getters e setters para as propriedades da classe.
+    get idProfessor() { return this._idProfessor; }
+    set idProfessor(value) { this._idProfessor = value; }
 
-    get idRequisicao() {
-        return this._idRequisicao;
-    }
+    get idDisciplina() { return this._idDisciplina; }
+    set idDisciplina(value) { this._idDisciplina = value; }
 
-    set idRequisicao(idRequisicao) {
-        this._idRequisicao = idRequisicao;
-    }
+    get justRequisicao() { return this._justRequisicao; }
+    set justRequisicao(value) { this._justRequisicao = value; }
 
-    get tipoRequisicao(){
-        return this._tipoRequisicao;
-    }
+    get gNRequisicao() { return this._gNRequisicao; }
+    set gNRequisicao(value) { this._gNRequisicao = value; }
 
-    set tipoRequisicao(tipoRequisicao) {
-        this._tipoRequisicao = tipoRequisicao;
-    }
+    get modeloRequisicao() { return this._modeloRequisicao; }
+    set modeloRequisicao(value) { this._modeloRequisicao = value; }
 
-    get codigoComprovanteRequisicao(){
-        return this._codigoComprovanteRequisicao;
-    }
+    get statusRequisicao() { return this._statusRequisicao; }
+    set statusRequisicao(value) { this._statusRequisicao = value; }
 
-    set codigoComprovanteRequisicao(codigoComprovanteRequisicao) {
-        this._codigoComprovanteRequisicao = codigoComprovanteRequisicao;
-    }
+    get matriculaAluno() { return this._matriculaAluno; }
+    set matriculaAluno(value) { this._matriculaAluno = value; }
 
-    get aluno() {
-        return this._aluno;
-    }
-
-    set aluno(aluno) {
-        this._aluno = aluno;
-    }
+    get dataRequisicao() { return this._dataRequisicao; }
+    set dataRequisicao(value) { this._dataRequisicao = value; }
 }
 
 // Exporta a classe Requisicao para que possa ser utilizada em outros módulos.

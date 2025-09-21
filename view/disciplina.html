@@ -193,6 +193,13 @@
             }
             const linha = document.createElement("tr");
 
+            const txtAlterarNome = document.createElement("input");
+            txtAlterarNome.type = 'text';
+            txtAlterarNome.value = disciplina.nomeDisciplina;
+            txtAlterarNome.disabled = true;
+            txtAlterarNome.id = "nomeDisciplina_" + disciplina.nomeDisciplina;
+            txtAlterarNome.name = "nomeDisciplina"; 
+
             const btnExcluir = document.createElement("button");
             btnExcluir.appendChild(document.createTextNode("Excluir"));
             btnExcluir.onclick = function () {
@@ -200,16 +207,17 @@
             }
 
             const btnSelecionar = document.createElement("button");
-            btnSelecionar.appendChild(document.createTextNode("Selecionar"));
-            btnSelecionar.onclick = function () {
-                selecionarDisciplina(disciplina);
-            }
+            btnSelecionar.textContent = "Selecionar";
+            btnSelecionar.onclick = () => { txtAlterarNome.disabled = false;}
 
             const btnAtualizar = document.createElement("button");
-            btnAtualizar.appendChild(document.createTextNode("Atualizar"));
-            btnAtualizar.onclick = function () {
-                update_disciplina();
-            }
+            btnAtualizar.textContent = "Atualizar";
+            btnAtualizar.onclick = () => {
+                const nomeDisciplina = txtAlterarNome.value;     
+                const idProfessor = disciplina.professor_idProfessor;         
+                txtAlterarNome.disabled = true;
+                put_disciplinas(disciplina.idDisciplina, nomeDisciplina, idProfessor);
+            };
 
             const tdID = document.createElement("td");
             const tdNome = document.createElement("td");
@@ -223,8 +231,8 @@
             let nomeProfessor = professor ? professor.nomeProfessor : "Professor não encontrado";
 
             tdID.appendChild(document.createTextNode(disciplina.idDisciplina));
-            tdNome.appendChild(document.createTextNode(disciplina.nomeDisciplina));
-            tdProfessor.appendChild(document.createTextNode(nomeProfessor)); // ⚠️ aqui estava errado
+            tdNome.appendChild(txtAlterarNome);
+            tdProfessor.appendChild(document.createTextNode(nomeProfessor));
             tdExcluir.appendChild(btnExcluir);
             tdSelecionar.appendChild(btnSelecionar);
             tdAtualizar.appendChild(btnAtualizar);
@@ -239,59 +247,9 @@
         }
     }
 
-    
-
-    function update_disciplina() {
-
-        const id = txtIDisciplina.value;
-        const nomeDisciplina = txtNomeDisciplina.value;
-        const idProfessor = cboProfessors.value;
-
-        const corpo = {
-            "disciplina": {
-                "nomeDisciplina": nomeDisciplina,
-                "professor_idProfessor": idProfessor,
-            }
-        };
-
-        if(nomeDisciplina==""){
-            alert("o nome não pode ser vazio");
-            return;
-        }
-
-        const URI = "http://localhost:5050/disciplina/"+id;
-        fetch(URI, {
-            method: "PUT",
-            body: JSON.stringify(corpo),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + objUsuario.token
-            }
-        }).then((resposta) => {
-            return resposta.text();
-        }).then(respostaConvertida => {
-            console.log(respostaConvertida);
-            get_disciplinas();
-            const objResposta = JSON.parse(respostaConvertida);
-            if (objResposta.status == false) {
-                alert(objResposta.msg);
-            }
-
-        }).catch(erro => {
-            console.log(erro);
-        });
-    }
-
-    
-
-    function selecionarDisciplina(disciplina) {
-        document.getElementById("txtIDisciplina").value = disciplina.idDisciplina || "";
-        document.getElementById("txtNomeDisciplina").value = disciplina.nomeDisciplina || "";
-        document.getElementById("cboProfessors").value = disciplina.professor_idProfessor || "";
-    }
 
 
-    function put_disciplinas(idDisciplina,nomeDisciplina) {
+    function put_disciplinas(idDisciplina,nomeDisciplina, idProfessor) {
         const URI = "http://localhost:5050/disciplina/" + idDisciplina;
         if (nomeDisciplina == "") {
             alert("o nome do disciplina não pode ser vazio");
@@ -300,7 +258,8 @@
 
         const objDisciplina = {
             disciplina: {
-                nomeDisciplina: nomeDisciplina
+                nomeDisciplina: nomeDisciplina,
+                professor_idProfessor: idProfessor
             }
         }
 

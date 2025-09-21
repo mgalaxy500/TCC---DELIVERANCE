@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Página de Requerimento</title>
+  <link rel="stylesheet" href="CSS/requisicao.css">
+</head>
+
+<body>
+  <div class="faixa-topo"></div>
+
+  <div class="univap-logo">
+    <img src="Imagens/Univap[Negativo].png" alt="Logo Univap">
+  </div>
+
+  <div class="faixa-base"></div>
+
+  <div class="quadrado-branco">
+
+    <div class="formulario-container">
+      <!-- Coluna 1: Campos de texto -->
+      <div class="caixas-texto">
+        <div class="matricula-container" >
+          <p class="text-matricula">N° de matrícula</p>
+          <input type="text" id="txtMatricula" placeholder="Ex: 50230223">
+        </div>
+
+        <div class="disciplina-container">
+          <p class="text-disciplina">Disciplina</p>
+          <select id="disciplina" name="disciplina" required>
+          </select>
+        </div>
+
+        <div class="professor-container">
+          <p class="text-professor">Professor</p>
+          <select id="professor" name="professor" required>
+          </select>
+        </div>
+      </div>
+
+      <!-- Coluna 2: Campos de rádio -->
+      <div class="radio-container">
+        <div class="semana-container">
+          <p class="titulo">Semana:</p>
+          <label><input type="radio" name="opcao-semana" value="G1"> G1</label>
+          <label><input type="radio" name="opcao-semana" value="G2"> G2</label>
+          <label><input type="radio" name="opcao-semana" value="G3"> G3</label>
+        </div>
+
+        <div class="requirimento-container">
+          <p class="titulo">Tipo de requerimento:</p>
+          <label><input type="radio" name="opcao-requerimento" value="Atestado"> Atestado</label>
+          <label><input type="radio" name="opcao-requerimento" value="Boleto"> Boleto</label>
+          <label><input type="radio" name="opcao-requerimento" value="Outro"> Outro</label>
+        </div>
+
+        <div class="prova-container">
+          <p class="titulo">Modelo de prova:</p>
+          <label><input type="radio" name="opcao-prova" value="Dissertativa"> Dissertativa</label>
+          <label><input type="radio" name="opcao-prova" value="Objetiva"> Objetiva</label>
+        </div>
+      </div>
+
+      <!-- Coluna 3: Data + botão -->
+      <div class="arquivos-barra">
+        <div class="data-container">
+          <p class="text-data">Data da prova</p>
+          <input class="selecionar-data" id="dataRequisicao" type="date">
+        </div>
+        <div id="errorMessage" class="error-message" style="color:red; display:none;"></div>
+        <button class="enviar-button" type="button" id="enviarBtn">Enviar</button>
+      </div>
+    </div>
+
+    <!-- Overlay e mensagem de sucesso -->
+    <div class="overlay" id="overlay"></div>
+    <div class="success-message" id="successMessage">
+      Requerimento enviado com sucesso!
+    </div>
+  </div>
+
+  <script>
+    const selectProfessor = document.getElementById("professor");
+    const selectDisciplina = document.getElementById("disciplina");
+
+    const dadosLocalStorage = localStorage.getItem("dados");
+    const objUsuario = dadosLocalStorage ? JSON.parse(dadosLocalStorage) : null;
+
+    let JSON_PROFESSORES = [];
+    let JSON_DISCIPLINAS = [];
+
+    function get_professores() {
+      if (!objUsuario || !objUsuario.token) {
+        console.error("Token de autenticação não encontrado.");
+        return;
+      }
+
+      const URI = "http://localhost:5050/professor/";
+
+      fetch(URI, {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + objUsuario.token
+        }
+      })
+      .then(res => res.text())
+      .then(respostaConvertida => {
+        const dados = JSON.parse(respostaConvertida);
+
+        if (dados.professors && Array.isArray(dados.professors)) {
+          JSON_PROFESSORES = dados.professors;
+          montarComboProfessores();
+        } else {
+          console.warn("Resposta inesperada da API de professores:", dados);
+        }
+      })
+      .catch(erro => {
+        console.error("Erro ao buscar professores:", erro);
+      });
+    }
+
+    function get_disciplinas() {
+      if (!objUsuario || !objUsuario.token) {
+        console.error("Token de autenticação não encontrado.");
+        return;
+      }
+
+      const URI = "http://localhost:5050/disciplina/";
+
+      fetch(URI, {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + objUsuario.token
+        }
+      })
+      .then(res => res.text())
+      .then(respostaConvertida => {
+        const dados = JSON.parse(respostaConvertida);
+
+        if (dados.disciplinas && Array.isArray(dados.disciplinas)) {
+          JSON_DISCIPLINAS = dados.disciplinas;
+          montarComboDisciplinas();
+        } else {
+          console.warn("Resposta inesperada da API de disciplinas:", dados);
+        }
+      })
+      .catch(erro => {
+        console.error("Erro ao buscar disciplinas:", erro);
+      });
+    }
+
+    function montarComboProfessores() {
+      selectProfessor.innerHTML = '<option value="" disabled selected hidden>Selecione um professor</option>';
+      for (let professor of JSON_PROFESSORES) {
+        const option = document.createElement("option");
+        option.value = professor.idProfessor;     
+        option.text = professor.nomeProfessor;    
+        selectProfessor.appendChild(option);
+      }
+    }
+
+    function montarComboDisciplinas() {
+      selectDisciplina.innerHTML = '<option value="" disabled selected hidden>Selecione uma disciplina</option>';
+
+      for (let disciplina of JSON_DISCIPLINAS) {
+        const option = document.createElement("option");
+        option.value = disciplina.idDisciplina;  
+        option.text = disciplina.nomeDisciplina;
+        selectDisciplina.appendChild(option);
+      }
+    }
+    window.onload = function () {
+      get_professores();
+      get_disciplinas();
+    };
+    const enviarBtn = document.getElementById('enviarBtn');
+    const overlay = document.getElementById('overlay');
+    const successMessage = document.getElementById('successMessage');
+
+    enviarBtn.onclick = function () {
+      post_requisicao();
+      
+    };
+
+    overlay.onclick = () => {
+      overlay.style.opacity = '0';
+      overlay.style.visibility = 'hidden';
+      successMessage.style.opacity = '0';
+      successMessage.style.transform = 'translate(-50%, -50%) scale(0.8)';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        successMessage.style.display = 'none';
+      }, 300);
+    };
+
+    function post_requisicao() {
+      const URI = "http://localhost:5050/requisicao";
+
+      const dadosLocalStorage = localStorage.getItem("dados");
+      const objUsuario = JSON.parse(dadosLocalStorage);
+
+      const matriculaAluno = document.getElementById("txtMatricula").value;
+      const idDisciplina   = document.getElementById("disciplina").value;
+      const idProfessor    = document.getElementById("professor").value;
+      const dataRequisicao = document.getElementById("dataRequisicao").value;
+
+      const gNRequisicao = document.querySelector("input[name='opcao-semana']:checked")?.value;
+      const modeloRequisicao = document.querySelector("input[name='opcao-prova']:checked")?.value;
+      const justRequisicao   = document.querySelector("input[name='opcao-requerimento']:checked")?.value;
+
+      const objRequisicao = {
+        requisicao: {
+          matriculaAluno: matriculaAluno,
+          idProfessor: idProfessor,
+          idDisciplina: idDisciplina,
+          justRequisicao: justRequisicao,
+          dataRequisicao: dataRequisicao,
+          gNRequisicao: gNRequisicao,
+          modeloRequisicao: modeloRequisicao,
+          statusRequisicao: 1
+        }
+      };
+
+      const errorDiv = document.getElementById("errorMessage");
+
+      fetch(URI, {
+        method: "POST",
+        body: JSON.stringify(objRequisicao),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + objUsuario.token
+        }
+      })
+        .then(resposta => resposta.text())
+        .then(respostaConvertida => {
+          const obj = JSON.parse(respostaConvertida);
+
+          if (obj.status === true) {
+            errorDiv.style.display = "none"; // esconde erro se sucesso
+            console.log("Enviado:", JSON.stringify(objRequisicao));
+            enviarBtn.textContent = 'Enviando...';
+            enviarBtn.disabled = true;
+
+            setTimeout(() => {
+              overlay.style.display = 'block';
+              successMessage.style.display = 'block';
+
+              setTimeout(() => {
+                overlay.style.opacity = '1';
+                overlay.style.visibility = 'visible';
+                successMessage.style.opacity = '1';
+                successMessage.style.transform = 'translate(-50%, -50%) scale(1)';
+              }, 50);
+
+              enviarBtn.textContent = 'Enviar';
+              enviarBtn.disabled = false;
+
+              setTimeout(() => {
+                overlay.style.opacity = '0';
+                overlay.style.visibility = 'hidden';
+                successMessage.style.opacity = '0';
+                successMessage.style.transform = 'translate(-50%, -50%) scale(0.8)';
+
+                setTimeout(() => {
+                  overlay.style.display = 'none';
+                  successMessage.style.display = 'none';
+                }, 300);
+              }, 3000);
+            }, 1000);
+          } else {
+            errorDiv.style.display = "block";
+            errorDiv.textContent = obj.msg || "Erro ao enviar requerimento";
+          }
+        })
+        .catch(erro => {
+          console.log("Erro na requisição:", erro);
+          errorDiv.style.display = "block";
+          errorDiv.textContent = "Erro inesperado ao enviar requisição";
+        });
+    }
+  </script>
+</body>
+
+</html>

@@ -42,15 +42,16 @@
 
   <script>
 
-    let JSON_ESTADOS = {};
+    let JSON_PROFESSORES = {};
     const dadosLocalStorage = localStorage.getItem("dados");
     const objUsuario = JSON.parse(dadosLocalStorage);
 
     const divDados = document.getElementById("divDados");
     const txtProfessor = document.getElementById("txtNomeProfessor");
     const txtFiltro = document.getElementById("txtFiltro");
+
     txtFiltro.onkeyup = function () {
-        construirTabela(JSON_ESTADOS, txtFiltro.value);
+        construirTabela(JSON_PROFESSORES, txtFiltro.value);
     }
     const btnCadastrar = document.getElementById("btnCadastrar");
 
@@ -176,8 +177,8 @@
         }).then((resposta) => {
           return resposta.text();
         }).then(respostaConvertida => {
-          JSON_ESTADOS = JSON.parse(respostaConvertida);
-          construirTabela(JSON_ESTADOS, '')
+          JSON_PROFESSORES = JSON.parse(respostaConvertida);
+          construirTabela(JSON_PROFESSORES, '')
         }).catch(erro => {
             console.log(erro);
         })

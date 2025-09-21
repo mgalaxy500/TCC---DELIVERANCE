@@ -80,21 +80,18 @@
     const td3 = document.createElement("th");
     const td4 = document.createElement("th");
     const td5 = document.createElement("th");
-    const td6 = document.createElement("th");
-    td0.appendChild(document.createTextNode("ID"));
-    td1.appendChild(document.createTextNode("NOME DO ALUNO"));
-    td2.appendChild(document.createTextNode("MATRICULA DO ALUNO"));
-    td3.appendChild(document.createTextNode("TURMA DO ALUNO"));
-    td4.appendChild(document.createTextNode("EXCLUIR"));
-    td5.appendChild(document.createTextNode("Selecionar"));
-    td6.appendChild(document.createTextNode("Atualizar"));
+    td0.appendChild(document.createTextNode("NOME DO ALUNO"));
+    td1.appendChild(document.createTextNode("MATRICULA DO ALUNO"));
+    td2.appendChild(document.createTextNode("TURMA DO ALUNO"));
+    td3.appendChild(document.createTextNode("EXCLUIR"));
+    td4.appendChild(document.createTextNode("Selecionar"));
+    td5.appendChild(document.createTextNode("Atualizar"));
     linha1.appendChild(td0);
     linha1.appendChild(td1);
     linha1.appendChild(td2);
     linha1.appendChild(td3);
     linha1.appendChild(td4);
     linha1.appendChild(td5);
-    linha1.appendChild(td6);
 
     get_alunos();
 
@@ -110,8 +107,8 @@
       }
     }
 
-    function delete_aluno(idAluno) {
-      const URI = "http://localhost:5050/aluno/" + idAluno;
+    function delete_aluno(matriculaAluno) {
+      const URI = "http://localhost:5050/aluno/" + matriculaAluno;
       fetch(URI, {
         method: "DELETE",
         headers: {
@@ -147,25 +144,36 @@
 
         const linha = document.createElement("tr");
 
-        const txtAlterar = document.createElement("input");
-        txtAlterar.type = 'text';
-        txtAlterar.value = aluno.nomeAluno;
-        txtAlterar.disabled = true;
+        const txtAlterarNome = document.createElement("input");
+        txtAlterarNome.type = 'text';
+        txtAlterarNome.value = aluno.nomeAluno;
+        txtAlterarNome.disabled = true;
+        txtAlterarNome.id = "nomeAluno_" + aluno.matriculaAluno;   // id único
+        txtAlterarNome.name = "nomeAluno";                         // ou um name genérico
+
+        const txtAlterarTurma = document.createElement("input");
+        txtAlterarTurma.type = 'text';
+        txtAlterarTurma.value = aluno.turmaAluno;
+        txtAlterarTurma.disabled = true;
+        txtAlterarTurma.id = "turmaAluno_" + aluno.matriculaAluno;   // id único
+        txtAlterarTurma.name = "turmaAluno";                         // ou um name genérico
 
         const btnExcluir = document.createElement("button");
         btnExcluir.textContent = "Excluir";
-        btnExcluir.onclick = () => delete_aluno(aluno.idAluno);
+        btnExcluir.onclick = () => delete_aluno(aluno.matriculaAluno);
 
         const btnSelecionar = document.createElement("button");
         btnSelecionar.textContent = "Selecionar";
-        btnSelecionar.onclick = () => { txtAlterar.disabled = false; }
+        btnSelecionar.onclick = () => { txtAlterarNome.disabled = false; txtAlterarTurma.disabled = false; }
 
         const btnAtualizar = document.createElement("button");
         btnAtualizar.textContent = "Atualizar";
         btnAtualizar.onclick = () => {
-          const nomeAluno = txtAlterar.value;
-          txtAlterar.disabled = true;
-          put_alunos(aluno.idAluno, nomeAluno);
+          const nomeAluno = txtAlterarNome.value;
+          const turmaAluno = txtAlterarTurma.value;
+          txtAlterarNome.disabled = true;
+          txtAlterarTurma.disabled = true;
+          put_alunos(aluno.matriculaAluno, nomeAluno, turmaAluno);
         };
 
         const td0 = document.createElement("td");
@@ -174,15 +182,14 @@
         const td3 = document.createElement("td");
         const td4 = document.createElement("td");
         const td5 = document.createElement("td");
-        const td6 = document.createElement("td");
 
-        td0.textContent = aluno.idAluno;
-        td1.appendChild(txtAlterar);
-        td2.textContent = aluno.matriculaAluno;
-        td3.textContent = aluno.turmaAluno;
-        td4.appendChild(btnExcluir);
-        td5.appendChild(btnSelecionar);
-        td6.appendChild(btnAtualizar);
+  
+        td0.appendChild(txtAlterarNome);
+        td1.textContent = aluno.matriculaAluno;
+        td2.appendChild(txtAlterarTurma);
+        td3.appendChild(btnExcluir);
+        td4.appendChild(btnSelecionar);
+        td5.appendChild(btnAtualizar);
 
         linha.appendChild(td0);
         linha.appendChild(td1);
@@ -190,7 +197,6 @@
         linha.appendChild(td3);
         linha.appendChild(td4);
         linha.appendChild(td5);
-        linha.appendChild(td6);
 
         tabela.appendChild(linha);
       }
@@ -216,14 +222,14 @@
       })
     }
 
-    function put_alunos(idAluno, nomeAluno) {
-      const URI = "http://localhost:5050/aluno/" + idAluno;
+    function put_alunos(matriculaAluno, nomeAluno, turmaAluno) {
+      const URI = "http://localhost:5050/aluno/" + matriculaAluno;
       if (!nomeAluno) {
         alert("O nome do aluno não pode ser vazio");
         return;
       }
 
-      const objAluno = { aluno: { nomeAluno: nomeAluno } };
+      const objAluno = { aluno: { nomeAluno: nomeAluno, turmaAluno: turmaAluno } };
 
       fetch(URI, {
         method: "PUT",
