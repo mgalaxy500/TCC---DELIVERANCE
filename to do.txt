@@ -5,3 +5,6 @@
 -fazer função de criar requisição de SUB funcionar (FEITO)
 -adicionar o componente "bimestre" na tabela "requisição"
 -(opcional?) adicionar forma de atualizar professor de determinada disciplina
+-abaixo do campo de matrícula da requisição, colocar o nome do aluno, caso seja encontrado no Bando de Dados
+-requisição direto no início
+-indicação que se trata da Univap CENTRO
