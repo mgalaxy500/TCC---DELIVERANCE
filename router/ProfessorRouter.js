@@ -41,6 +41,12 @@ module.exports = class ProfessorRouter {
             this.professorControl.create
         );
 
+        this.router.post('/csv',
+            this.jwtMiddleware.validate,
+            upload.single('variavelArquivo'),
+            ProfessorControl.createByCSV
+        );
+
         this.router.delete('/:idProfessor',
             this.jwtMiddleware.validate,
             this.professorControl.delete

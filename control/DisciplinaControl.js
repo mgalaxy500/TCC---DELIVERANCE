@@ -26,6 +26,57 @@ module.exports = class DisciplinaControl {
         response.status(200).send(objResposta);
     }
 
+    static async createByCSV(request, response) {
+        if (!request.file) {
+            return response.status(400).json({
+                cod: 0,
+                status: false,
+                msg: "Nenhum arquivo foi enviado."
+            });
+        }
+
+        const disciplinas = [];
+        fs.createReadStream(request.file.path)
+            .pipe(csv({ separator: ',' })) // Usa o cabeçalho do arquivo!
+            .on('data', (row) => {
+                if (row.nomeDisciplina && row.professor_idProfessor) {
+                    const disciplina = new Disciplina();
+                    disciplina.nomeDisciplina = String(row.nomeDisciplina).trim();
+                    disciplina.professor_idProfessor = Number(row.professor_idProfessor);
+                    disciplinas.push(disciplina);
+                }
+            })
+            .on('end', async () => {
+                const resultados = [];
+                for (const disciplina of disciplinas) {
+                    const isCreated = await disciplina.create();
+                    if (isCreated) {
+                        resultados.push({
+                            nomeDisciplina: disciplina.nomeDisciplina,
+                            professor_idProfessor: disciplina.professor_idProfessor
+                        });
+                    }
+                }
+                response.status(201).json({
+                    cod: 1,
+                    status: resultados.length > 0,
+                    msg: resultados.length > 0 ? 'Disciplinas cadastradas com sucesso' : 'Nenhuma disciplina cadastrada',
+                    disciplinas: resultados
+                });
+                fs.unlink(request.file.path, (err) => {
+                    if (err) console.error("Erro ao remover o arquivo:", err);
+                });
+            })
+            .on('error', (err) => {
+                console.error("Erro ao processar o arquivo CSV:", err);
+                response.status(500).json({
+                    cod: 0,
+                    status: false,
+                    msg: "Erro ao processar o arquivo CSV."
+                });
+            });
+    }
+
     // Método assíncrono para excluir um disciplina existente.
     async delete(request, response) {
         // Cria uma nova instância do modelo Disciplina.

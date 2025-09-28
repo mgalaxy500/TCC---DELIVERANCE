@@ -17,8 +17,9 @@ class Requisicao {
         this._justRequisicao = null;
         this._gNRequisicao = null;
         this._modeloRequisicao = null;
-        this._statusRequisicao = null; // 0 = Aprovado, 1 = Pendente, 2 = Rejeitado
+        this._statusRequisicao = null; // 0 = Aprovado, 1 = Pendente
         this._matriculaAluno = null;
+        this._bimestreRequisicao = null;
     }
 
     // Método assíncrono para criar um novo requisicao no banco de dados.
@@ -26,8 +27,8 @@ class Requisicao {
     const conexao = Banco.getConexao();
     const SQL = `
         INSERT INTO requisicao 
-        (aluno_matriculaAluno, professor_idProfessor, disciplina_idDisciplina, justRequisicao, dataRequisicao, gNRequisicao, modeloRequisicao, statusRequisicao)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+        (aluno_matriculaAluno, professor_idProfessor, disciplina_idDisciplina, justRequisicao, dataRequisicao, gNRequisicao, modeloRequisicao, statusRequisicao, bimestreRequisicao)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
 
     try {
@@ -35,11 +36,12 @@ class Requisicao {
             this._matriculaAluno,         // aluno_matriculaAluno
             this._idProfessor,            // professor_idProfessor
             this._idDisciplina,           // disciplina_idDisciplina
-            this._justRequisicao, // justRequisicao
+            this._justRequisicao,         // justRequisicao
             this._dataRequisicao,         // dataRequisicao
             this._gNRequisicao,           // gNRequisicao
             this._modeloRequisicao,       // modeloRequisicao
-            this._statusRequisicao        // statusRequisicao
+            this._statusRequisicao,       // statusRequisicao
+            this._bimestreRequisicao      // bimestreRequisicao
         ]);
         this._idRequisicao = result.insertId;
         return result.affectedRows > 0;
@@ -139,6 +141,9 @@ class Requisicao {
 
     get dataRequisicao() { return this._dataRequisicao; }
     set dataRequisicao(value) { this._dataRequisicao = value; }
+
+    get bimestreRequisicao() { return this._bimestreRequisicao; }
+    set bimestreRequisicao(value) { this._bimestreRequisicao = value; }
 }
 
 // Exporta a classe Requisicao para que possa ser utilizada em outros módulos.

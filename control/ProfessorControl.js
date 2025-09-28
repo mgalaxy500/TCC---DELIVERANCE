@@ -3,6 +3,7 @@ const express = require('express');
 // Importa o modelo Professor para realizar operações relacionadas à entidade Professor.
 const Professor = require('../model/Professor');
 const fs = require('fs');
+const csv = require('csv-parser');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 // Exporta a classe ProfessorControl, que controla as operações de CRUD (Create, Read, Update, Delete) para o Professor.
@@ -25,7 +26,7 @@ module.exports = class ProfessorControl {
         response.status(200).send(objResposta);
     }
 
-    async createByJSON(request, response) {
+    static async createByCSV(request, response) {
         const professors = []; // Array para armazenar os professors processados
     
         try {
@@ -69,6 +70,54 @@ module.exports = class ProfessorControl {
             });
         }
     }
+
+    static async createByCSV(request, response) {
+        if (!request.file) {
+            return response.status(400).json({
+                cod: 0,
+                status: false,
+                msg: "Nenhum arquivo foi enviado."
+            });
+        }
+
+        const professors = [];
+        fs.createReadStream(request.file.path)
+            .pipe(require('csv-parser')({ separator: ',' })) // Usa cabeçalho do arquivo!
+            .on('data', (row) => {
+                if (row.nomeProfessor && row.nomeProfessor.trim().length > 0) {
+                    const professor = new Professor();
+                    professor.nomeProfessor = row.nomeProfessor.trim();
+                    professors.push(professor);
+                }
+            })
+            .on('end', async () => {
+                const resultados = [];
+                for (const professor of professors) {
+                    const isCreated = await professor.create();
+                    if (isCreated) {
+                        resultados.push(professor.nomeProfessor);
+                    }
+                }
+                response.status(201).json({
+                    cod: 1,
+                    status: resultados.length > 0,
+                    msg: resultados.length > 0 ? 'Professores cadastrados com sucesso' : 'Nenhum professor cadastrado',
+                    professores: resultados
+                });
+                fs.unlink(request.file.path, (err) => {
+                    if (err) console.error("Erro ao remover o arquivo:", err);
+                });
+            })
+            .on('error', (err) => {
+                console.error("Erro ao processar o arquivo CSV:", err);
+                response.status(500).json({
+                    cod: 0,
+                    status: false,
+                    msg: "Erro ao processar o arquivo CSV."
+                });
+            });
+    }
+
     // Método assíncrono para excluir um professor existente.
     async delete(request, response) {
         // Cria uma nova instância do modelo Professor.

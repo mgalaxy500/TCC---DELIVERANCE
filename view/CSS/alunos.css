@@ -59,7 +59,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 5px;
 }
 
 /* ===== CAIXAS DE TEXTO ===== */
@@ -98,6 +98,7 @@ h1 {
   transition: 0.15s;
 }
 
+
 /* ===== EFEITO DE FOCO NOS CAMPOS ===== */
 .nome-container input:focus,
 .matricula-container input:focus,
@@ -122,6 +123,20 @@ h1 {
   border-radius: 5px;
   font-size: 16px;
   padding: 10px 30px;
+  margin-top: 5px;
+  box-shadow: 0px 4px 5px rgba(128, 128, 128, 0.3);
+  transition: opacity 0.15s;
+  cursor: pointer;
+}
+
+.upload-button {
+  background-color: rgb(221, 221, 221);
+  color: white;
+  border: none;
+  display: inline-block;
+  border-radius: 5px;
+  font-size: 16px;
+  padding: 10px 20px;
   margin-top: 20px;
   box-shadow: 0px 4px 5px rgba(128, 128, 128, 0.3);
   transition: opacity 0.15s;
@@ -254,4 +269,36 @@ td input[type="text"]:disabled {
   #container {
     max-width: 1000px;
   }
+}
+
+/* ===== INPUT FILE ===== */
+.upload-button-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* espaço entre input e botão */
+  justify-content: center;
+}
+
+.upload-button input[type="file"] {
+  display: block;
+  margin: 20px auto;
+  font-size: 36px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 30px;
+  width: auto;   /* faz o input ocupar apenas o necessário */
+  flex: none;    /* impede de "esticar" no flexbox */
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+.upload-button {
+  background-color: #414141;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
 }

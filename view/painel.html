@@ -25,19 +25,46 @@
       <div class="filtros-container">
         <input type="text" id="filtroNome" class="filtro-input" placeholder="Filtrar por nome do aluno..." />
 
-        <select id="filtroTurma" class="filtro-select">
-          <option value="">Filtrar por turma...</option>
-          <option value="1A">1A</option>
-          <option value="2B">2B</option>
-          <option value="3A">3A</option>
+        <input type="text" id="filtroMatricula" class="filtro-input" placeholder="Filtrar por matrícula do aluno..." />
+
+        <input type="text" id="filtroTurma" class="filtro-input" placeholder="Filtrar pela turma do aluno..." />
+
+        <input type="text" id="filtroProfessor" class="filtro-input" placeholder="Filtrar por professor..." />
+
+        <input type="text" id="filtroDisciplina" class="filtro-input" placeholder="Filtrar pela disciplina..." />
+
+        <input type="text" id="filtroJust" class="filtro-input" placeholder="Filtrar pela justificativa..." />
+
+        <input type="text" id="filtroData" class="filtro-input" placeholder="Filtrar pela data..." />
+
+        <select id="filtroSemana" class="filtro-select">
+          <option value="">Filtrar pela semana...</option>
+          <option value="G1">G1</option>
+          <option value="G2">G2</option>
+          <option value="G3">G3</option>
+        </select>
+
+        <select id="filtroModelo" class="filtro-select">
+          <option value="">Filtrar pelo modelo da prova...</option>
+          <option value="Dissertativa">Dissertativa</option>
+          <option value="Objetiva">Objetiva</option>
+        </select>
+
+        <select id="filtroBimestre" class="filtro-select">
+          <option value="">Filtrar pelo bimestre...</option>
+          <option value="1">1º Bimestre</option>
+          <option value="2">2º Bimestre</option>
+          <option value="3">3º Bimestre</option>
+          <option value="4">4º Bimestre</option>
         </select>
 
         <select id="filtroStatus" class="filtro-select">
           <option value="">Filtrar por status...</option>
           <option value="pendente">Pendente</option>
           <option value="aprovado">Aprovado</option>
-          <option value="reprovado">Reprovado</option>
         </select>
+
+
       </div>
 
       <!-- DADOS DO USUÁRIO -->
@@ -50,7 +77,8 @@
           <a href="alunos.html" class="botao-navegacao">Alunos</a>
           <a href="professor.html" class="botao-navegacao">Professores</a>
           <a href="disciplina.html" class="botao-navegacao">Disciplinas</a>
-          <a href="funcionario.html" class="botao-navegacao">Funcionários</a>         
+          <a href="funcionario.html" class="botao-navegacao">Funcionários</a>   
+          <a href="requisicao.html" class="botao-navegacao">Requisições</a>       
         </div>
       </div>
 
@@ -111,23 +139,59 @@
       });
     }
 
-    // Função para filtrar requerimentos
     function filtrarRequerimentos() {
       const filtroNome = document.getElementById('filtroNome').value.toLowerCase();
-      const filtroTurma = document.getElementById('filtroTurma').value;
+      const filtroMatricula = document.getElementById('filtroMatricula').value.toLowerCase();
+      const filtroTurma = document.getElementById('filtroTurma').value.toLowerCase();
+      const filtroProfessor = document.getElementById('filtroProfessor').value.toLowerCase();
+      const filtroDisciplina = document.getElementById('filtroDisciplina').value.toLowerCase();
+      const filtroJust = document.getElementById('filtroJust').value.toLowerCase();
+      const filtroData = document.getElementById('filtroData').value.toLowerCase();
+      const filtroSemana = document.getElementById('filtroSemana').value;
+      const filtroModelo = document.getElementById('filtroModelo').value;
+      const filtroBimestre = document.getElementById('filtroBimestre').value;
       const filtroStatus = document.getElementById('filtroStatus').value;
+
       const cards = document.querySelectorAll('.requerimento-card');
 
       cards.forEach(card => {
-        const nome = card.dataset.nome.toLowerCase();
-        const turma = card.dataset.turma;
-        const status = card.dataset.status;
+        const nome = (card.dataset.nome || "").toLowerCase();
+        const matricula = (card.dataset.matricula || "").toLowerCase();
+        const turma = (card.dataset.turma || "").toLowerCase();
+        const professor = (card.dataset.professor || "").toLowerCase();
+        const disciplina = (card.dataset.disciplina || "").toLowerCase();
+        const justificativa = (card.dataset.just || "").toLowerCase();
+        const data = (card.dataset.data || "").toLowerCase();
+        const semana = card.dataset.semana || "";
+        const modelo = card.dataset.modelo || "";
+        const bimestre = card.dataset.bimestre || "";
+        const status = card.dataset.status || "";
 
         const nomeMatch = nome.includes(filtroNome);
-        const turmaMatch = !filtroTurma || turma === filtroTurma;
+        const matriculaMatch = matricula.includes(filtroMatricula);
+        const turmaMatch = turma.includes(filtroTurma);
+        const professorMatch = professor.includes(filtroProfessor);
+        const disciplinaMatch = disciplina.includes(filtroDisciplina);
+        const justMatch = justificativa.includes(filtroJust);
+        const dataMatch = data.includes(filtroData);
+        const semanaMatch = !filtroSemana || semana === filtroSemana;
+        const modeloMatch = !filtroModelo || modelo === filtroModelo;
+        const bimestreMatch = !filtroBimestre || bimestre === filtroBimestre;
         const statusMatch = !filtroStatus || status === filtroStatus;
 
-        if (nomeMatch && turmaMatch && statusMatch) {
+        if (
+          nomeMatch &&
+          matriculaMatch &&
+          turmaMatch &&
+          professorMatch &&
+          disciplinaMatch &&
+          justMatch &&
+          dataMatch &&
+          semanaMatch &&
+          modeloMatch &&
+          bimestreMatch &&
+          statusMatch
+        ) {
           card.style.display = 'block';
         } else {
           card.style.display = 'none';
@@ -135,11 +199,18 @@
       });
     }
 
-    
-
-    // Event listeners para os filtros
+    // Ativando filtros (inputs → input, selects → change)
     document.getElementById('filtroNome').addEventListener('input', filtrarRequerimentos);
-    document.getElementById('filtroTurma').addEventListener('change', filtrarRequerimentos);
+    document.getElementById('filtroMatricula').addEventListener('input', filtrarRequerimentos);
+    document.getElementById('filtroTurma').addEventListener('input', filtrarRequerimentos);
+    document.getElementById('filtroProfessor').addEventListener('input', filtrarRequerimentos);
+    document.getElementById('filtroDisciplina').addEventListener('input', filtrarRequerimentos);
+    document.getElementById('filtroJust').addEventListener('input', filtrarRequerimentos);
+    document.getElementById('filtroData').addEventListener('input', filtrarRequerimentos);
+
+    document.getElementById('filtroSemana').addEventListener('change', filtrarRequerimentos);
+    document.getElementById('filtroModelo').addEventListener('change', filtrarRequerimentos);
+    document.getElementById('filtroBimestre').addEventListener('change', filtrarRequerimentos);
     document.getElementById('filtroStatus').addEventListener('change', filtrarRequerimentos);
 
     // Funções para aprovar e reprovar requerimentos
@@ -239,8 +310,16 @@
       return `
         <div class="requerimento-card" 
             data-id="${req.idRequisicao}" 
-            data-nome="${req.aluno_matriculaAluno || ''}" 
+            data-nome="${req.nomeAluno || ''}" 
+            data-matricula="${req.aluno_matriculaAluno || ''}"
             data-turma="${req.turmaAluno || ''}" 
+            data-professor="${nomeProfessor || ''}" 
+            data-disciplina="${nomeDisciplina || ''}" 
+            data-just="${req.justRequisicao || ''}" 
+            data-data="${dataProva || ''}" 
+            data-semana="${req.gNRequisicao || ''}" 
+            data-modelo="${req.modeloRequisicao || ''}" 
+            data-bimestre="${req.bimestreRequisicao || ''}" 
             data-status="${status}">
           <p><strong>Nome:</strong> ${req.nomeAluno || ''}</p>
           <p><strong>Matrícula:</strong> ${req.aluno_matriculaAluno || ''}</p>
@@ -251,6 +330,7 @@
           <p><strong>Data da Prova da Falta:</strong> ${dataProva || ''}</p>
           <p><strong>Semana:</strong> ${req.gNRequisicao || ''}</p>
           <p><strong>Modelo:</strong> ${req.modeloRequisicao || ''}</p>
+          <p><strong>Bimestre:</strong> ${req.bimestreRequisicao || ''}</p>
           <div class="botoes-status">
             <button class="btn-aprovar" onclick="aprovarRequerimento(this)">Aprovar</button>
             <button class="btn-reprovar" onclick="reprovarRequerimento(this)">Reprovar</button>

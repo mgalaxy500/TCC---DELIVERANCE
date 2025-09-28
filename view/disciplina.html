@@ -55,6 +55,11 @@
         <button id="btnCadastrar" class="enviar-button">Cadastrar Disciplina</button>
       </div>
 
+    <div class="upload-button-container">
+        <input type="file" id="arquivo" class="upload-button">
+        <button id="btnUpload" class="upload-button" type="button">Enviar CSV</button>
+    </div>
+
       <div id="divDados">
    </div>
 </body>
@@ -113,6 +118,32 @@
         post_disciplinas();
     }
 
+    btnUpload.onclick = function (event) {
+        event.preventDefault(); // <-- Adicione esta linha
+        const dados = new FormData();
+        dados.append('variavelArquivo', arquivo.files[0]);
+
+        const URI = "http://localhost:5050/disciplina/csv/";
+        fetch(URI, {
+            method: "POST",
+            body: dados,
+            headers: {
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_alunos();
+            const resposta = JSON.parse(respostaConvertida);
+            if (resposta.status == true) {
+                alert("Alunos cadastrados com sucesso");
+            }
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+    
     function limparTabela() {
         var qtdLinas = 1;
         var totalLinhas = tabela.rows.length;

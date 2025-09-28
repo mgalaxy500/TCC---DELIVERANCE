@@ -21,11 +21,7 @@ module.exports = class DisciplinaRouter {
     createRoutes() {
         const multer = require('multer');
         const upload = multer({ dest: 'uploads/' }); // Configura o multer para armazenar os arquivos na pasta 'uploads'
-        this.router.post('/csv',
-            this.jwtMiddleware.validate,
-            upload.single('variavelArquivo'),//nome da variavel definida no javascript ou no insominia
-            this.disciplinaControl.createByCSV
-        );
+        
 
         this.router.get('/',
             this.jwtMiddleware.validate,
@@ -42,6 +38,12 @@ module.exports = class DisciplinaRouter {
             this.disciplinaMiddleware.validar_NomeDisciplina,
             this.disciplinaMiddleware.isNot_disciplinaByNomeDisciplina,
             this.disciplinaControl.create
+        );
+
+        this.router.post('/csv',
+            this.jwtMiddleware.validate,
+            upload.single('variavelArquivo'),
+            DisciplinaControl.createByCSV
         );
 
         this.router.delete('/:idDisciplina',

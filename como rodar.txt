@@ -2,6 +2,8 @@ Instale o Node.js no Windows (não lembro como faz, olha no google) e o Node Exp
 
 Abra o App.js (mesma pasta deste arquivo) no Visual Studio e abra o terminal (Ctrl + '). 
 
+Instale no terminal: npm install csv-parser --save
+
 Use "cd" para ir para a pasta do App.js (ex.: cd C:\xampp\htdocs) e depois digite "node App.js"
 
 Depois, veja se o CMD mostrou a mensagem "API rodando no endereço "http://localhost:5050/"

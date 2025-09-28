@@ -3,8 +3,9 @@
 -fazer função de criação de Excel
 -fazer função do painel mostrar as requisições de SUB (FEITO)
 -fazer função de criar requisição de SUB funcionar (FEITO)
--adicionar o componente "bimestre" na tabela "requisição"
--(opcional?) adicionar forma de atualizar professor de determinada disciplina
--abaixo do campo de matrícula da requisição, colocar o nome do aluno, caso seja encontrado no Bando de Dados
--requisição direto no início
--indicação que se trata da Univap CENTRO
+-adicionar o componente "bimestre" na tabela "requisição" (FEITO)
+-(opcional?) adicionar forma de atualizar professor de determinada disciplina (nah)
+-abaixo do campo de matrícula da requisição, colocar o nome do aluno, caso seja encontrado no Bando de Dados (FEITO)
+-requisição direto no início (já tava feito)
+-indicação que se trata da Univap CENTRO (não acho q precisa)
+-CSV de alunos (FEITO)

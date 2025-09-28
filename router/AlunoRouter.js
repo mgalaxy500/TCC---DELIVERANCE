@@ -34,6 +34,12 @@ module.exports = class AlunoRouter {
             this.alunoControl.create
         );
 
+        this.router.post('/csv',
+            this.jwtMiddleware.validate,
+            upload.single('variavelArquivo'),
+            AlunoControl.createByCSV
+        );
+
         this.router.delete('/:matriculaAluno',
             this.jwtMiddleware.validate,
             this.alunoControl.delete

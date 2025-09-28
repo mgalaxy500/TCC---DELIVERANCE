@@ -212,3 +212,40 @@ td input[type="text"]:disabled {
 #divDados {
   margin-top: 20px;
 }
+
+button:hover {
+  background-color: #218838;
+}
+
+/* ===== INPUT FILE ===== */
+.upload-button-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* espaço entre input e botão */
+  justify-content: center;
+}
+
+.upload-button input[type="file"] {
+  display: block;
+  margin: 20px auto;
+  font-size: 36px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 30px;
+  width: auto;   /* faz o input ocupar apenas o necessário */
+  flex: none;    /* impede de "esticar" no flexbox */
+}
+
+.upload-button {
+  background-color: rgb(82, 82, 82);
+  color: white;
+  border: none;
+  display: inline-block;
+  border-radius: 5px;
+  font-size: 16px;
+  padding: 10px 20px;
+  margin-top: 20px;
+  box-shadow: 0px 4px 5px rgba(128, 128, 128, 0.3);
+  transition: opacity 0.15s;
+  cursor: pointer;
+}

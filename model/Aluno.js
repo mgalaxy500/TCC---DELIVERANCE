@@ -39,7 +39,7 @@ class Aluno {
 
                 try {
                     const SQL = 'INSERT INTO aluno (matriculaAluno, nomeAluno, turmaAluno) VALUES (?, ?, ?);';
-                    const [result] = await conexao.promise().execute(SQL, [aluno.nomeAluno, aluno.matriculaAluno, aluno.turmaAluno]);
+                    const [result] = await conexao.promise().execute(SQL, [aluno.matriculaAluno, aluno.nomeAluno, aluno.turmaAluno]);
                     
                     if (result.affectedRows > 0) {
                         alunosCriados.push({ matriculaAluno : aluno.matriculaAluno, nomeAluno: aluno.nomeAluno, turmaAluno: aluno.turmaAluno});

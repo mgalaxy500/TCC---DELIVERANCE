@@ -269,3 +269,7 @@ body {
   background-color: #fff3cd;
   color: #856404;
 }
+
+button:hover {
+  background-color: #218838;
+}

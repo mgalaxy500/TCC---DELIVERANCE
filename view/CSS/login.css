@@ -70,3 +70,7 @@ body {
 .login-button:active {
 	opacity: 0.5;
 }
+
+button:hover {
+  background-color: #218838;
+}

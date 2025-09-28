@@ -1,5 +1,7 @@
 const express = require('express');
 const Funcionario = require('../model/Funcionario');
+const csv = require('csv-parser');
+const fs = require('fs');
 
 module.exports = class FuncionarioControl {
     
@@ -64,6 +66,57 @@ module.exports = class FuncionarioControl {
         }
     }
 
+    static async createByCSV(request, response) {
+        if (!request.file) {
+            return response.status(400).json({
+                cod: 0,
+                status: false,
+                msg: "Nenhum arquivo foi enviado."
+            });
+        }
+
+        const funcionarios = [];
+        fs.createReadStream(request.file.path)
+            .pipe(csv({ separator: ',' })) // Usa o cabeçalho do arquivo!
+            .on('data', (row) => {
+                if (row.nomeFuncionario && row.senhaFuncionario) {
+                    const funcionario = new Funcionario();
+                    funcionario.nomeFuncionario = String(row.nomeFuncionario).trim();
+                    funcionario.senhaFuncionario = String(row.senhaFuncionario).trim();
+                    funcionarios.push(funcionario);
+                }
+            })
+            .on('end', async () => {
+                const resultados = [];
+                for (const funcionario of funcionarios) {
+                    const isCreated = await funcionario.create();
+                    if (isCreated) {
+                        resultados.push({
+                            nomeFuncionario: funcionario.nomeFuncionario,
+                            senhaFuncionario: funcionario.senhaFuncionario
+                        });
+                    }
+                }
+                response.status(201).json({
+                    cod: 1,
+                    status: resultados.length > 0,
+                    msg: resultados.length > 0 ? 'Funcionários cadastrados com sucesso' : 'Nenhum funcionário cadastrado',
+                    funcionarios: resultados
+                });
+                fs.unlink(request.file.path, (err) => {
+                    if (err) console.error("Erro ao remover o arquivo:", err);
+                });
+            })
+            .on('error', (err) => {
+                console.error("Erro ao processar o arquivo CSV:", err);
+                response.status(500).json({
+                    cod: 0,
+                    status: false,
+                    msg: "Erro ao processar o arquivo CSV."
+                });
+            });
+    }
+    
     async update(request, response) {
         const funcionario = new Funcionario();
 

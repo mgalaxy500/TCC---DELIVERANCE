@@ -3,6 +3,7 @@ const express = require('express');
 // Importa o modelo Aluno para realizar operações relacionadas à entidade Aluno.
 const Aluno = require('../model/Aluno');
 const fs = require('fs');
+const csv = require('csv-parser');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 // Exporta a classe AlunoControl, que controla as operações de CRUD (Create, Read, Update, Delete) para o Aluno.
@@ -27,50 +28,61 @@ module.exports = class AlunoControl {
         response.status(200).send(objResposta);
     }
 
-    async createByJSON(request, response) {
-        const aluno = []; // Array para armazenar os aluno processados
-    
-        try {
-            // Verifica se `request.body` é um array de aluno
-            if (Array.isArray(request.body)) {
-                for (const item of request.body) {
-                    if (item.nomeAluno && item.nomeAluno.length > 5) {
-                        const aluno = new Aluno();
-                        aluno.nomeAluno = item.nomeAluno.trim();
-                        const isCreated = await aluno.create();
-    
-                        if (isCreated) {
-                            aluno.push(aluno);
-                        }
-                    }
-                }
-    
-                // Envia a resposta com sucesso
-                response.status(201).send({
-                    cod: 1,
-                    status: true,
-                    msg: 'Aluno cadastrados com sucesso',
-                    aluno: aluno
-                });
-    
-            } else {
-                console.error('O conteúdo do JSON deve ser um array.');
-                return response.status(400).send({
-                    cod: 0,
-                    status: false,
-                    msg: "Formato do JSON inválido. Deve ser um array de objetos."
-                });
-            }
-    
-        } catch (error) {
-            console.error('Erro ao processar o JSON:', error);
-            return response.status(500).send({
+    static async createByCSV(request, response) {
+        if (!request.file) {
+            return response.status(400).json({
                 cod: 0,
                 status: false,
-                msg: "Erro ao processar o JSON."
+                msg: "Nenhum arquivo foi enviado."
             });
         }
+
+        const alunos = [];
+
+        fs.createReadStream(request.file.path)
+            .pipe(csv({ separator: ',' })) // NÃO defina headers, pois o arquivo já tem cabeçalho!
+            .on('data', (row) => {
+                if (row.matriculaAluno && row.nomeAluno && row.turmaAluno) {
+                    const aluno = new Aluno();
+                    aluno.matriculaAluno = String(row.matriculaAluno).replace(/[\r\n]+/g, '').trim();
+                    aluno.nomeAluno = String(row.nomeAluno).replace(/[\r\n]+/g, '').trim();
+                    aluno.turmaAluno = String(row.turmaAluno).replace(/[\r\n]+/g, '').trim();
+                    alunos.push(aluno);
+                }
+            })
+            .on('end', async () => {
+                const resultados = [];
+                for (const aluno of alunos) {
+                    const isCreated = await aluno.create();
+                    if (isCreated) {
+                        resultados.push({
+                            matriculaAluno: aluno.matriculaAluno,
+                            nomeAluno: aluno.nomeAluno,
+                            turmaAluno: aluno.turmaAluno
+                        });
+                    }
+                }
+                response.status(201).json({
+                    cod: 1,
+                    status: resultados.length > 0,
+                    msg: resultados.length > 0 ? 'Alunos cadastrados com sucesso' : 'Nenhum aluno cadastrado',
+                    alunos: resultados
+                });
+                fs.unlink(request.file.path, (err) => {
+                    if (err) console.error("Erro ao remover o arquivo:", err);
+                });
+            })
+            .on('error', (err) => {
+                console.error("Erro ao processar o arquivo CSV:", err);
+                response.status(500).json({
+                    cod: 0,
+                    status: false,
+                    msg: "Erro ao processar o arquivo CSV."
+                });
+            });
     }
+
+
     // Método assíncrono para excluir um aluno existente.
     async delete(request, response) {
         // Cria uma nova instância do modelo Aluno.

@@ -26,6 +26,10 @@
           <input type="text" id="txtMatricula" placeholder="Ex: 50230223">
         </div>
 
+        <div class="nome-aluno-container">
+          <input type="text" id="nomeAlunoExibido" placeholder="Nome será exibido aqui" disabled>
+        </div>
+
         <div class="disciplina-container">
           <p class="text-disciplina">Disciplina</p>
           <select id="disciplina" name="disciplina" required>
@@ -60,6 +64,14 @@
           <label><input type="radio" name="opcao-prova" value="Dissertativa"> Dissertativa</label>
           <label><input type="radio" name="opcao-prova" value="Objetiva"> Objetiva</label>
         </div>
+
+        <div class="bimestre-container">
+          <p class="titulo">Bimestre da prova:</p>
+          <label><input type="radio" name="opcao-bimestre" value="1º"> 1º Bimestre</label>
+          <label><input type="radio" name="opcao-bimestre" value="2º"> 2º Bimestre</label>
+          <label><input type="radio" name="opcao-bimestre" value="3º"> 3º Bimestre</label>
+          <label><input type="radio" name="opcao-bimestre" value="4º"> 4º Bimestre</label>
+        </div>
       </div>
 
       <!-- Coluna 3: Data + botão -->
@@ -89,6 +101,34 @@
 
     let JSON_PROFESSORES = [];
     let JSON_DISCIPLINAS = [];
+    let JSON_ALUNOS = [];
+
+    function get_alunos() {
+      if (!objUsuario || !objUsuario.token) {
+        console.error("Token de autenticação não encontrado.");
+        return;
+      }
+      const URI = "http://localhost:5050/aluno/";
+      fetch(URI, {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + objUsuario.token
+        }
+      })
+      .then(res => res.text())
+      .then(respostaConvertida => {
+        const dados = JSON.parse(respostaConvertida);
+        if (dados.aluno && Array.isArray(dados.aluno)) {
+          JSON_ALUNOS = dados.aluno;
+        } else {
+          console.warn("Resposta inesperada da API de alunos:", dados);
+        }
+      })
+      .catch(erro => {
+        console.error("Erro ao buscar alunos:", erro);
+      });
+    }
 
     function get_professores() {
       if (!objUsuario || !objUsuario.token) {
@@ -172,10 +212,26 @@
         selectDisciplina.appendChild(option);
       }
     }
+
     window.onload = function () {
       get_professores();
       get_disciplinas();
+      get_alunos();
     };
+
+    // Atualize o nome do aluno em tempo real
+    document.getElementById("txtMatricula").addEventListener("input", function() {
+      const matricula = this.value.trim();
+      const campoNome = document.getElementById("nomeAlunoExibido");
+      if (matricula.length === 0) {
+        campoNome.value = "";
+        return;
+      }
+      const matriculaInt = parseInt(matricula, 10);
+      const aluno = JSON_ALUNOS.find(a => Number(a.matriculaAluno) === matriculaInt);
+      campoNome.value = aluno ? aluno.nomeAluno : "Não encontrado";
+    });
+
     const enviarBtn = document.getElementById('enviarBtn');
     const overlay = document.getElementById('overlay');
     const successMessage = document.getElementById('successMessage');
@@ -202,7 +258,7 @@
       const dadosLocalStorage = localStorage.getItem("dados");
       const objUsuario = JSON.parse(dadosLocalStorage);
 
-      const matriculaAluno = document.getElementById("txtMatricula").value;
+      const matriculaAluno = parseInt(document.getElementById("txtMatricula").value, 10);
       const idDisciplina   = document.getElementById("disciplina").value;
       const idProfessor    = document.getElementById("professor").value;
       const dataRequisicao = document.getElementById("dataRequisicao").value;
@@ -210,6 +266,7 @@
       const gNRequisicao = document.querySelector("input[name='opcao-semana']:checked")?.value;
       const modeloRequisicao = document.querySelector("input[name='opcao-prova']:checked")?.value;
       const justRequisicao   = document.querySelector("input[name='opcao-requerimento']:checked")?.value;
+      const bimestreRequisicao  = document.querySelector("input[name='opcao-bimestre']:checked")?.value;
 
       const objRequisicao = {
         requisicao: {
@@ -220,7 +277,8 @@
           dataRequisicao: dataRequisicao,
           gNRequisicao: gNRequisicao,
           modeloRequisicao: modeloRequisicao,
-          statusRequisicao: 1
+          statusRequisicao: 1,
+          bimestreRequisicao: bimestreRequisicao,
         }
       };
 

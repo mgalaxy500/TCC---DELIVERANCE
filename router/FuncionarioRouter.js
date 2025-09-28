@@ -35,6 +35,12 @@ module.exports = class FuncionarioRouter {
             this.funcionarioControl.create
         );
 
+        this.router.post('/csv',
+            this.jwtMiddleware.validate,
+            upload.single('variavelArquivo'),
+            FuncionarioControl.createByCSV
+        );
+
         this.router.delete('/:idFuncionario',
             this.jwtMiddleware.validate,
             this.funcionarioControl.delete
