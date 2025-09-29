@@ -18,6 +18,7 @@ module.exports = class RequisicaoControl {
         requisicao.gNRequisicao = request.body.requisicao.gNRequisicao;
         requisicao.modeloRequisicao = request.body.requisicao.modeloRequisicao;
         requisicao.statusRequisicao = request.body.requisicao.statusRequisicao;
+        requisicao.bimestreRequisicao =  request.body.requisicao.bimestreRequisicao;
         console.log(request.body.requisicao);
         const isCreated = await requisicao.create();
         const objResposta = {

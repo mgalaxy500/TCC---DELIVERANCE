@@ -10,18 +10,14 @@ module.exports = class RequisicaoMiddleware {
 
     async validar_MatriculaAluno(request, response, next) {
 
-        // Recupera o nome do aluno enviado no corpo da requisição (request body).
         const matriculaAluno = request.body.requisicao.matriculaAluno;
-        // Verifica se o nome do aluno tem menos de 3 caracteres.
-        if (matriculaAluno.length !== 8) {
-            // Se o nome for inválido, cria um objeto de resposta com o status falso e a mensagem de erro.
-            const objResposta = {
+        if (String(matriculaAluno).length !== 8) {
+            return response.status(400).send({
                 status: false,
-                msg: "A matricula deve ter deve ter 8 caracteres"
-            }
-            // Envia a resposta com status HTTP 400 e a mensagem de erro.
-            response.status(400).send(objResposta);
-        } else {
+                msg: "A matrícula deve ter 8 caracteres"
+            });
+        }
+        else {
             // Caso o nome seja válido, chama o próximo middleware ou a rota definida.
             next(); // Chama o próximo middleware ou rota
         }
