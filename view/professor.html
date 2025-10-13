@@ -208,6 +208,7 @@
         }).then((resposta) => {
           return resposta.text();
         }).then(respostaConvertida => {
+          console.log(respostaConvertida);
           JSON_PROFESSORES = JSON.parse(respostaConvertida);
           construirTabela(JSON_PROFESSORES, '')
         }).catch(erro => {

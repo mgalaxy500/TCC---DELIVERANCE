@@ -108,7 +108,7 @@ input:disabled {
 }
 
 .enviar-button {
-  background-color: rgb(182, 27, 27);
+  background-color: rgb(27, 37, 182);
   color: white;
   border: none;
   border-radius: 5px;
@@ -163,15 +163,17 @@ tr:nth-child(even) td {
 }
 
 /* ===== BOTÕES DA TABELA ===== */
-td button {
+td button,
+td button-delete {
   padding: 6px 12px;
+  background-color: rgb(53, 53, 53);
+  color: white;
   border: none;
   border-radius: 4px;
-  font-size: 12px;
-  margin: 2px;
-  color: white;
   cursor: pointer;
   transition: opacity 0.15s;
+  font-size: 12px;
+  margin: 2px;
 }
 
 td button:hover {
@@ -245,6 +247,10 @@ td input[type="text"]:disabled {
 
 button:hover {
   background-color: #218838;
+}
+
+button-delete:hover {
+  background-color: #882121;
 }
 
 /* ===== INPUT FILE ===== */

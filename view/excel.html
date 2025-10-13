@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Professor</title>
+  <link rel="stylesheet" href="CSS/professor.css">
+  <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+</head>
+
+<body>
+  <div class="faixa-topo">
+    <div class="univap-logo">
+      <img src="Imagens/Univap[Negativo].png" alt="Logo Univap" />
+    </div>
+    <div class="faixa-base"></div>
+  </div>
+
+  <div id="container">
+    <h1>GERADOR DE EXCEL</h1>
+
+    <div class="button-container">
+      <button id="btnEA" class="enviar-button">Excel Alunos</button>
+    </div>
+    <div class="button-container">
+      <button id="btnEP" class="enviar-button">Excel Professores</button>
+    </div>
+    <div class="button-container">
+      <button id="btnED" class="enviar-button">Excel Disciplinas</button>
+    </div>
+    <div class="button-container">
+      <button id="btnER" class="enviar-button">Excel Requisições</button>
+    </div>
+
+  <script>
+
+    const dadosLocalStorage = localStorage.getItem("dados");
+    const objUsuario = JSON.parse(dadosLocalStorage);
+    const btnEA = document.getElementById("btnEA");
+    const btnEP = document.getElementById("btnEP");
+    const btnED = document.getElementById("btnED");
+    const btnER = document.getElementById("btnER");
+
+    btnEA.onclick = function () {
+      gerarExcelAluno();
+    }
+
+    btnEP.onclick = function () {
+      gerarExcelProfessor();
+    }
+
+    btnED.onclick = function () {
+      gerarExcelDisciplina();
+    }
+
+    btnER.onclick = function () {
+      gerarExcelRequisicao();
+    }
+
+    async function gerarExcelAluno() {
+        // 1. Buscar os alunos do backend
+        // Pegue o token do localStorage ou de onde você salva após o login
+
+        const resposta = await fetch('http://localhost:5050/aluno', {
+          headers: {
+            'Authorization': 'Bearer ' + objUsuario.token
+          }
+        });
+        const dados = await resposta.json();
+        const alunos = dados.aluno || dados.alunos || [];
+
+        // 2. Criar a planilha
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Alunos');
+
+        worksheet.columns = [
+          { header: 'Matrícula', key: 'matriculaAluno', width: 15 },
+          { header: 'Nome', key: 'nomeAluno', width: 30 },
+          { header: 'Turma', key: 'turmaAluno', width: 10 }
+        ];
+
+        // 3. Adicionar os dados
+        alunos.forEach(aluno => worksheet.addRow(aluno));
+
+        // 4. Gerar nome do arquivo com data/hora
+        const agora = new Date();
+        const nomeArquivo = `Alunos_${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}_${String(agora.getHours()).padStart(2,'0')}-${String(agora.getMinutes()).padStart(2,'0')}.xlsx`;
+
+        // 5. Gerar e baixar o arquivo
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = nomeArquivo;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+
+    async function gerarExcelProfessor() {
+        const resposta = await fetch('http://localhost:5050/professor', {
+          headers: {
+            'Authorization': 'Bearer ' + objUsuario.token
+          }
+        });
+        const dados = await resposta.json();
+        const professores = dados.professors || dados.professor || dados.professores || [];
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Professores');
+
+        worksheet.columns = [
+          { header: 'ID Professor', key: 'idProfessor', width: 15 },
+          { header: 'Nome do Professor', key: 'nomeProfessor', width: 30 }
+        ];
+
+        professores.forEach(prof => worksheet.addRow(prof));
+
+        const agora = new Date();
+        const nomeArquivo = `Professores_${agora.toISOString().replace(/[:T]/g, '-').slice(0, 16)}.xlsx`;
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = nomeArquivo;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+
+    async function gerarExcelDisciplina() {
+        const resposta = await fetch('http://localhost:5050/disciplina', {
+          headers: {
+            'Authorization': 'Bearer ' + objUsuario.token
+          }
+        });
+        const dados = await resposta.json();
+        const disciplinas = dados.disciplina || dados.disciplinas || [];
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Disciplinas');
+
+        worksheet.columns = [
+          { header: 'ID Disciplina', key: 'idDisciplina', width: 15 },
+          { header: 'Nome da Disciplina', key: 'nomeDisciplina', width: 30 },
+          { header: 'ID Professor', key: 'professor_idProfessor', width: 15 }
+        ];
+
+        disciplinas.forEach(disc => worksheet.addRow(disc));
+
+        const agora = new Date();
+        const nomeArquivo = `Disciplinas_${agora.toISOString().replace(/[:T]/g, '-').slice(0, 16)}.xlsx`;
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = nomeArquivo;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+    
+
+    async function gerarExcelRequisicao() {
+        const resposta = await fetch('http://localhost:5050/requisicao', {
+          headers: {
+            'Authorization': 'Bearer ' + objUsuario.token
+          }
+        });
+        const dados = await resposta.json();
+        console.log("📦 Resposta da API de Requisição:", dados);
+        const requisicoes = dados.requisicaos || dados.requisicoes || dados.requisicao || [];
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Requisições');
+
+        worksheet.columns = [
+          { header: 'ID Requisição', key: 'idRequisicao', width: 15 },
+          { header: 'Matrícula Aluno', key: 'aluno_matriculaAluno', width: 15 },
+          { header: 'ID Professor', key: 'professor_idProfessor', width: 15 },
+          { header: 'ID Disciplina', key: 'disciplina_idDisciplina', width: 15 },
+          { header: 'Justificativa', key: 'justRequisicao', width: 20 },
+          { header: 'Data', key: 'dataRequisicao', width: 20 },
+          { header: 'GN', key: 'gNRequisicao', width: 10 },
+          { header: 'Modelo', key: 'modeloRequisicao', width: 15 },
+          { header: 'Status', key: 'statusRequisicao', width: 10 },
+          { header: 'Bimestre', key: 'bimestreRequisicao', width: 10 }
+        ];
+
+        requisicoes.forEach(req => worksheet.addRow(req));
+
+        const agora = new Date();
+        const nomeArquivo = `Requisicoes_${agora.toISOString().replace(/[:T]/g, '-').slice(0, 16)}.xlsx`;
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = nomeArquivo;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+    
+  </script>
+</body>
+</html>

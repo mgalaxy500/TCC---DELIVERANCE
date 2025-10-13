@@ -77,11 +77,12 @@ body {
 
 .filtro-input,
 .filtro-select {
-  width: 100%;
+  background-color: #ededed;
+  color: #838282;
+  border: 1px solid #ccc;
+  border-radius: 3px;
   padding: 8px;
   font-size: 14px;
-  border-radius: 3px;
-  border: 1px solid #ccc;
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
@@ -90,6 +91,16 @@ body {
 .filtro-select:focus {
   border-color: rgb(27, 54, 93);
   outline: none;
+}
+
+.filtro-input::placeholder,
+.filtro-select::placeholder {
+  color: #888 !important;
+  opacity: 1;
+}
+
+.filtro-select option[disabled][selected] {
+  color: #888;
 }
 
 /* ===== SEÇÕES ===== */
@@ -117,7 +128,8 @@ body {
 }
 
 .botao-navegacao,
-.botao-acao {
+.botao-acao,
+.botao-excel {
   color: white;
   border: none;
   border-radius: 3px;
@@ -130,7 +142,11 @@ body {
 }
 
 .botao-navegacao {
-  background-color: rgb(182, 27, 27);
+  background-color: rgb(27, 30, 182);
+}
+
+.botao-excel{
+  background-color: rgb(27, 182, 53);
 }
 
 .botao-acao {
@@ -268,8 +284,4 @@ body {
 .status-pendente {
   background-color: #fff3cd;
   color: #856404;
-}
-
-button:hover {
-  background-color: #218838;
 }

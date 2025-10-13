@@ -116,7 +116,7 @@ h1 {
 }
 
 .enviar-button {
-  background-color: rgb(182, 27, 27);
+  background-color: rgb(27, 37, 182);
   color: white;
   border: none;
   display: inline-block;
@@ -168,9 +168,10 @@ tr:nth-child(even) td {
 }
 
 /* ===== BOTÕES TABELA ===== */
-td button {
+td button,
+td button-delete {
   padding: 6px 12px;
-  background-color: rgb(182, 27, 27);
+  background-color: rgb(53, 53, 53);
   color: white;
   border: none;
   border-radius: 4px;
@@ -246,4 +247,8 @@ button:hover {
   box-shadow: 0px 4px 5px rgba(128, 128, 128, 0.3);
   transition: opacity 0.15s;
   cursor: pointer;
+}
+
+button-delete:hover {
+  background-color: #882121;
 }

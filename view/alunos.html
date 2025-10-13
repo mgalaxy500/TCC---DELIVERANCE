@@ -192,7 +192,7 @@
         txtAlterarTurma.id = "turmaAluno_" + aluno.matriculaAluno;   // id único
         txtAlterarTurma.name = "turmaAluno";                         // ou um name genérico
 
-        const btnExcluir = document.createElement("button");
+        const btnExcluir = document.createElement("button-delete");
         btnExcluir.textContent = "Excluir";
         btnExcluir.onclick = () => delete_aluno(aluno.matriculaAluno);
 

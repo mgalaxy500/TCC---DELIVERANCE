@@ -32,7 +32,7 @@ module.exports = class FuncionarioControl {
     async create(request, response) {
         const funcionario = new Funcionario();
 
-        funcionario.nomeFuncionario = request.body.funcionario.nomeFuncionario;
+        funcionario.emailFuncionario = request.body.funcionario.emailFuncionario;
         funcionario.senhaFuncionario = request.body.funcionario.senhaFuncionario;
 
         const cadastrou = await funcionario.create();
@@ -43,7 +43,7 @@ module.exports = class FuncionarioControl {
                 funcionarios: [{
                     "funcionario": {
                         "idFuncionario": funcionario.idFuncionario,
-                        "nomeFuncionario": funcionario.nomeFuncionario,
+                        "emailFuncionario": funcionario.emailFuncionario,
                         "senhaFuncionario": funcionario.senhaFuncionario,
                     }
                 }]
@@ -57,7 +57,7 @@ module.exports = class FuncionarioControl {
                 funcionarios: [{
                     "funcionario": {
                         "idFuncionario": funcionario.idFuncionario,
-                        "nomeFuncionario": funcionario.nomeFuncionario,
+                        "emailFuncionario": funcionario.emailFuncionario,
                         "senhaFuncionario": funcionario.sehaFuncionario,
                     }
                 }]
@@ -79,9 +79,9 @@ module.exports = class FuncionarioControl {
         fs.createReadStream(request.file.path)
             .pipe(csv({ separator: ',' })) // Usa o cabeçalho do arquivo!
             .on('data', (row) => {
-                if (row.nomeFuncionario && row.senhaFuncionario) {
+                if (row.emailFuncionario && row.senhaFuncionario) {
                     const funcionario = new Funcionario();
-                    funcionario.nomeFuncionario = String(row.nomeFuncionario).trim();
+                    funcionario.emailFuncionario = String(row.emailFuncionario).trim();
                     funcionario.senhaFuncionario = String(row.senhaFuncionario).trim();
                     funcionarios.push(funcionario);
                 }
@@ -92,7 +92,7 @@ module.exports = class FuncionarioControl {
                     const isCreated = await funcionario.create();
                     if (isCreated) {
                         resultados.push({
-                            nomeFuncionario: funcionario.nomeFuncionario,
+                            emailFuncionario: funcionario.emailFuncionario,
                             senhaFuncionario: funcionario.senhaFuncionario
                         });
                     }
@@ -121,7 +121,7 @@ module.exports = class FuncionarioControl {
         const funcionario = new Funcionario();
 
         funcionario.idFuncionario = request.params.idFuncionario;
-        funcionario.nomeFuncionario = request.body.funcionario.nomeFuncionario;
+        funcionario.emailFuncionario = request.body.funcionario.emailFuncionario;
         funcionario.senhaFuncionario = request.body.funcionario.senhaFuncionario;
 
         const atualizou = await funcionario.update();
@@ -132,7 +132,7 @@ module.exports = class FuncionarioControl {
                 funcionarios: [{
                     "funcionario": {
                         "idFuncionario": funcionario.idFuncionario,
-                        "nomeFuncionario": funcionario.nomeFuncionario,
+                        "emailFuncionario": funcionario.emailFuncionario,
                         "senhaFuncionario": funcionario.senhaFuncionario,
                     }
                 }]
@@ -146,7 +146,7 @@ module.exports = class FuncionarioControl {
                 funcionarios: [{
                     "funcionario": {
                         "idFuncionario": funcionario.idFuncionario,
-                        "nomeFuncionario": funcionario.nomeFuncionario,
+                        "emailFuncionario": funcionario.emailFuncionario,
                         "senhaFuncionario": funcionario.senhaFuncionario,
                     }
                 }]
@@ -168,7 +168,7 @@ module.exports = class FuncionarioControl {
                 funcionarios: [{
                     "funcionario": {
                         "idFuncionario": funcionario.idFuncionario,
-                        "nomeFuncionario": funcionario.nomeFuncionario,
+                        "emailFuncionario": funcionario.emailFuncionario,
                         "senhaFuncionario": funcionario.senhaFuncionario,
                     }
                 }]
@@ -182,7 +182,7 @@ module.exports = class FuncionarioControl {
                 funcionarios: [{
                     "funcionario": {
                         "idFuncionario": funcionario.idFuncionario,
-                        "nomeFuncionario": funcionario.nomeFuncionario,
+                        "emailFuncionario": funcionario.emailFuncionario,
                         "senhaFuncionario": funcionario.senhaFuncionario,
                     }
                 }]
