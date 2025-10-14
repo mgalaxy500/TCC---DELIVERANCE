@@ -26,7 +26,7 @@ body {
 /* ===== LOGO UNIVAP ===== */
 .univap-logo img {
   position: absolute;
-  top: -40px;
+  top: -45px;
   left: 20px;
   width: 180px;
   z-index: 1001;

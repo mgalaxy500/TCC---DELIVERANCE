@@ -1,6 +1,6 @@
 -fazer UPDATE de aluno funcionar, atualmente deleta a "turmaAluno" (FEITO)
 -consertar função de atualizar Disciplina (FEITO)
--fazer função de criação de Excel
+-fazer função de criação de Excel (FEITO)
 -fazer função do painel mostrar as requisições de SUB (FEITO)
 -fazer função de criar requisição de SUB funcionar (FEITO)
 -adicionar o componente "bimestre" na tabela "requisição" (FEITO)
@@ -9,4 +9,4 @@
 -requisição direto no início (já tava feito)
 -indicação que se trata da Univap CENTRO (não acho q precisa)
 -CSV de alunos (FEITO)
--scroll dos botões no painel
+-scroll dos botões no painel (não necessário mais)

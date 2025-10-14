@@ -1,40 +1,35 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastro de Professor</title>
-  <link rel="stylesheet" href="CSS/professor.css">
+  <title>Gerador de Excel | Univap</title>
+  <link rel="stylesheet" href="CSS/excel.css">
   <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 </head>
 
 <body>
-  <div class="faixa-topo">
+  <!-- FAIXA SUPERIOR -->
+  <header class="faixa-topo">
     <div class="univap-logo">
       <img src="Imagens/Univap[Negativo].png" alt="Logo Univap" />
+      <div class="faixa-base"></div>
     </div>
-    <div class="faixa-base"></div>
-  </div>
+  </header>
 
-  <div id="container">
-    <h1>GERADOR DE EXCEL</h1>
-
-    <div class="button-container">
-      <button id="btnEA" class="enviar-button">Excel Alunos</button>
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main id="container">
+    <h2> Gerador de Arquivos Excel</h2>
+    <p></p>
+    <div class="botoes-grid">
+      <button id="btnEA" class="botao-excel aluno"> Excel Alunos</button>
+      <button id="btnEP" class="botao-excel professor"> Excel Professores</button>
+      <button id="btnED" class="botao-excel disciplina"> Excel Disciplinas</button>
+      <button id="btnER" class="botao-excel requisicao"> Excel Requisições</button>
     </div>
-    <div class="button-container">
-      <button id="btnEP" class="enviar-button">Excel Professores</button>
-    </div>
-    <div class="button-container">
-      <button id="btnED" class="enviar-button">Excel Disciplinas</button>
-    </div>
-    <div class="button-container">
-      <button id="btnER" class="enviar-button">Excel Requisições</button>
-    </div>
+  </main>
 
   <script>
-
     const dadosLocalStorage = localStorage.getItem("dados");
     const objUsuario = JSON.parse(dadosLocalStorage);
     const btnEA = document.getElementById("btnEA");
@@ -202,7 +197,7 @@
         link.click();
         URL.revokeObjectURL(link.href);
     }
-    
+
   </script>
 </body>
 </html>
