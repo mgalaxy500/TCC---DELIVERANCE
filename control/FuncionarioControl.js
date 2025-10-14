@@ -122,7 +122,6 @@ module.exports = class FuncionarioControl {
 
         funcionario.idFuncionario = request.params.idFuncionario;
         funcionario.emailFuncionario = request.body.funcionario.emailFuncionario;
-        funcionario.senhaFuncionario = request.body.funcionario.senhaFuncionario;
 
         const atualizou = await funcionario.update();
         if (atualizou == true) {
@@ -133,7 +132,6 @@ module.exports = class FuncionarioControl {
                     "funcionario": {
                         "idFuncionario": funcionario.idFuncionario,
                         "emailFuncionario": funcionario.emailFuncionario,
-                        "senhaFuncionario": funcionario.senhaFuncionario,
                     }
                 }]
             };
@@ -147,7 +145,6 @@ module.exports = class FuncionarioControl {
                     "funcionario": {
                         "idFuncionario": funcionario.idFuncionario,
                         "emailFuncionario": funcionario.emailFuncionario,
-                        "senhaFuncionario": funcionario.senhaFuncionario,
                     }
                 }]
             };
@@ -188,6 +185,44 @@ module.exports = class FuncionarioControl {
                 }]
             };
             response.status(200).send(objResposta);
+        }
+    }
+
+    async changePassword(request, response) {
+        const { idFuncionario } = request.params;
+        const { senhaAtual, novaSenha } = request.body;
+
+        if (!senhaAtual || !novaSenha) {
+            return response.status(400).json({
+            status: false,
+            msg: "Informe a senha atual e a nova senha."
+            });
+        }
+
+        const funcionario = new Funcionario();
+        funcionario.idFuncionario = idFuncionario;
+
+        // Verifica se a senha atual está correta
+        const senhaCorreta = await funcionario.validarSenhaAtual(senhaAtual);
+        if (!senhaCorreta) {
+            return response.status(401).json({
+            status: false,
+            msg: "Senha atual incorreta."
+            });
+        }
+
+        const sucesso = await funcionario.atualizarSenha(novaSenha);
+
+        if (sucesso) {
+            return response.status(200).json({
+            status: true,
+            msg: "Senha alterada com sucesso."
+            });
+        } else {
+            return response.status(500).json({
+            status: false,
+            msg: "Erro ao alterar senha. Tente novamente."
+            });
         }
     }
 };

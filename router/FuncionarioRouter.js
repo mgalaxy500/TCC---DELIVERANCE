@@ -51,6 +51,11 @@ module.exports = class FuncionarioRouter {
             this.funcionarioControl.update
         );
 
+        this.router.put('/:idFuncionario/senha',
+            this.jwtMiddleware.validate,
+            this.funcionarioControl.changePassword
+        );
+
         return this.router;
     }
 

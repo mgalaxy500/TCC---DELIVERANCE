@@ -12,8 +12,12 @@ class Funcionario {
 
     // Método assíncrono para criar um novo funcionario no banco de dados.
     async create() {
+        if (!this._emailFuncionario || !this._senhaFuncionario) {
+            console.error("Email e senha são obrigatórios.");
+            return false;
+        }
         const conexao = Banco.getConexao();
-        const SQL = 'INSERT INTO funcionario (emailFuncionario, senhaFuncionario) VALUES (?, ?);';
+        const SQL = 'INSERT INTO funcionario (emailFuncionario, senhaFuncionario) VALUES (?, MD5(?));';
 
         try {
             const [result] = await conexao.promise().execute(SQL, [
@@ -74,11 +78,11 @@ class Funcionario {
     // Método assíncrono para atualizar os dados de um funcionario no banco de dados.
     async update() {
         const conexao = Banco.getConexao();
-        const SQL = 'UPDATE funcionario SET emailFuncionario = ?, senhaFuncionario = ?;';
+        const SQL = 'UPDATE funcionario SET emailFuncionario = ? WHERE idFuncionario = ?;';
 
         try {
             const [result] = await conexao.promise().execute(SQL, [
-                this._emailFuncionario, this._senhaFuncionario
+                this._emailFuncionario, this._idFuncionario
             ]);
             return result.affectedRows > 0;
         } catch (error) {
@@ -113,6 +117,43 @@ class Funcionario {
         } catch (error) {
             console.error('Erro ao ler funcionario pelo ID:', error);
             return null;
+        }
+    }
+
+    async isFuncionarioByEmail(emailFuncionario) {
+        const conexao = Banco.getConexao();  // Obtém a conexão com o banco de dados.
+        const SQL = 'SELECT COUNT(*) AS qtd FROM funcionario WHERE emailFuncionario = ?;';  // Query SQL para contar alunos com o mesmo nome.
+        try {
+            const [rows] = await conexao.promise().execute(SQL, [emailFuncionario]);  // Executa a query.
+            return rows[0].qtd > 0;  // Retorna true se houver algum aluno com o mesmo nome.
+        } catch (error) {
+            console.error('Erro ao verificar o aluno:', error);  // Exibe erro no console se houver falha.
+            return false;  // Retorna false caso ocorra um erro.
+        }
+    }
+
+    async validarSenhaAtual(senhaAtual) {
+        const conexao = Banco.getConexao();
+        const SQL = `SELECT COUNT(*) AS qtd FROM funcionario
+                    WHERE idFuncionario = ? AND senhaFuncionario = MD5(?);`;
+        try {
+            const [rows] = await conexao.promise().execute(SQL, [this._idFuncionario, senhaAtual]);
+            return rows[0].qtd === 1;
+        } catch (error) {
+            console.error('Erro ao validar senha atual:', error);
+            return false;
+        }
+    }
+
+    async atualizarSenha(novaSenha) {
+        const conexao = Banco.getConexao();
+        const SQL = `UPDATE funcionario SET senhaFuncionario = MD5(?) WHERE idFuncionario = ?;`;
+        try {
+            const [result] = await conexao.promise().execute(SQL, [novaSenha, this._idFuncionario]);
+            return result.affectedRows > 0;
+        } catch (error) {
+            console.error('Erro ao atualizar senha:', error);
+            return false;
         }
     }
 

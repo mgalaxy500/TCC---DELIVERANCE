@@ -44,6 +44,24 @@
     <div id="divDados"></div>
   </div>
 
+  <!-- ===== MODAL PARA MUDAR SENHA ===== -->
+  <div id="modalAlterarSenha" class="modal">
+    <div class="modal-content">
+      <h2>Alterar Senha</h2>
+
+      <label for="senhaAtual">Senha atual:</label>
+      <input type="password" id="senhaAtual" placeholder="Digite sua senha atual">
+
+      <label for="novaSenha">Nova senha:</label>
+      <input type="password" id="novaSenha" placeholder="Digite sua nova senha">
+
+      <div class="modal-buttons">
+        <button id="btnConfirmarSenha" class="btn-confirmar">Confirmar</button>
+        <button id="btnCancelarSenha" class="btn-cancelar">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let JSON_FUNCIONARIOS = {};
 
@@ -64,12 +82,14 @@
     const td2 = document.createElement("th");
     const td3 = document.createElement("th");
     const td4 = document.createElement("th");
+    const td5 = document.createElement("th");
 
     td0.appendChild(document.createTextNode("ID"));
     td1.appendChild(document.createTextNode("Email"));
     td2.appendChild(document.createTextNode("Selecionar"));
     td3.appendChild(document.createTextNode("Atualizar"));
     td4.appendChild(document.createTextNode("Excluir"));
+    td5.appendChild(document.createTextNode("Alterar Senha"));
 
     divDados.appendChild(tabela);
     tabela.appendChild(linha1);
@@ -79,6 +99,7 @@
     linha1.appendChild(td2);
     linha1.appendChild(td3);
     linha1.appendChild(td4);
+    linha1.appendChild(td5);
 
     btnCadastrar.onclick = function () {
       post_funcionarios();
@@ -99,12 +120,18 @@
       fetch(URI, {
         method: "DELETE",
         headers: {
-          'Authorization': 'Bearer ' + objUsuario.tokenn
+          'Authorization': 'Bearer ' + objUsuario.token
         }
-      }).then((resposta) => {
-        return resposta.text();
-      }).then(respostaConvertida => {
-        get_funcionarios();  // Atualiza a tabela após excluir
+      })
+      .then((resposta) => {
+        return resposta.json()
+      .then(dados => {
+        if (dados.status) {
+          get_funcionarios();
+        } else {
+          alert("Falha ao excluir funcionário: " + (dados.msg || ""));
+        }
+      });
       }).catch(erro => {
         console.log(erro);
       });
@@ -149,53 +176,89 @@
       });
     }
 
-    function selecionarFuncionario(funcionario) {
-      txtIFuncionario.value = funcionario.idFuncionario;
-      txtEmailFuncionario.value = funcionario.emailFuncionario;
-    }
-
     function construirTabela(JSON_FUNCIONARIOS, filtro) {
       limparTabela();
 
       for (let funcionario of JSON_FUNCIONARIOS) {
-        let linhaFuncionario = document.createElement("tr");
+        const linha = document.createElement("tr");
 
         const td0 = document.createElement("td");
         const td1 = document.createElement("td");
         const td2 = document.createElement("td");
         const td3 = document.createElement("td");
         const td4 = document.createElement("td");
+        const td5 = document.createElement("td");
 
-        td0.appendChild(document.createTextNode(funcionario.idFuncionario));
-        td1.appendChild(document.createTextNode(funcionario.emailFuncionario));
+        td0.textContent = funcionario.idFuncionario;
 
+        // 🔹 Campo de e-mail editável (como no outro código)
+        const txtAlterar = document.createElement("input");
+        txtAlterar.type = "text";
+        txtAlterar.value = funcionario.emailFuncionario;
+        txtAlterar.disabled = true; // só habilita ao clicar em "Selecionar"
+        td1.appendChild(txtAlterar);
+
+        // 🔹 Botão Selecionar
         const btnSelecionar = document.createElement("button");
-        btnSelecionar.appendChild(document.createTextNode("Selecionar"));
-        td2.appendChild(btnSelecionar);
-        btnSelecionar.onclick = function () {
-          selecionarFuncionario(funcionario);
+        btnSelecionar.textContent = "Selecionar";
+        btnSelecionar.onclick = () => {
+          txtAlterar.disabled = false; // permite editar
+          txtAlterar.focus();
         };
+        td2.appendChild(btnSelecionar);
 
+        // 🔹 Botão Atualizar
         const btnAtualizar = document.createElement("button");
-        btnAtualizar.appendChild(document.createTextNode("Atualizar"));
-        btnAtualizar.onclick = function () {
-          update_funcionario();
+        btnAtualizar.textContent = "Atualizar";
+        btnAtualizar.onclick = () => {
+          const novoEmail = txtAlterar.value.trim();
+          if (!novoEmail) {
+            alert("O email não pode ficar vazio!");
+            return;
+          }
+
+          // Chama o PUT direto aqui
+          const URI = `http://localhost:5050/funcionario/${funcionario.idFuncionario}`;
+          const corpo = { funcionario: { emailFuncionario: novoEmail } };
+
+          fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(corpo),
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + objUsuario.token
+            }
+          })
+          .then(res => res.text())
+          .then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status === true) {
+              alert("Funcionário atualizado com sucesso!");
+              txtAlterar.disabled = true;
+              get_funcionarios(); // atualiza a tabela
+            } else {
+              alert(obj.msg || "Erro ao atualizar funcionário.");
+            }
+          })
+          .catch(erro => console.error("Erro ao atualizar funcionário:", erro));
         };
         td3.appendChild(btnAtualizar);
 
+        // 🔹 Botão Excluir
         const btnExcluir = document.createElement("button");
-        btnExcluir.appendChild(document.createTextNode("Excluir"));
+        btnExcluir.textContent = "Excluir";
+        btnExcluir.onclick = () => delete_funcionario(funcionario.idFuncionario);
         td4.appendChild(btnExcluir);
-        btnExcluir.onclick = function () {
-          delete_funcionario(funcionario.idFuncionario);
-        };
 
-        linhaFuncionario.appendChild(td0);
-        linhaFuncionario.appendChild(td1);
-        linhaFuncionario.appendChild(td2);
-        linhaFuncionario.appendChild(td3);
-        linhaFuncionario.appendChild(td4);
-        tabela.appendChild(linhaFuncionario);
+        // 🔹 Botão Alterar Senha (mantém o modal)
+        const btnAlterarSenha = document.createElement("button");
+        btnAlterarSenha.textContent = "Alterar Senha";
+        btnAlterarSenha.onclick = () => abrirModalSenha(funcionario.idFuncionario);
+        td5.appendChild(btnAlterarSenha);
+
+        linha.append(td0, td1, td2, td3, td4, td5);
+        tabela.appendChild(linha);
       }
     }
 
@@ -215,11 +278,9 @@
         method: "POST",
         body: JSON.stringify(corpo),
         headers: {
-          headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + objUsuario.token
-          }
         }
       }).then((resposta) => {
         return resposta.text();
@@ -252,6 +313,96 @@
       }).catch(erro => {
         console.log(erro);
       });
+    }
+
+    function alterarSenha(idFuncionario) {
+      const senhaAtual = prompt("Digite sua senha atual:");
+      const novaSenha = prompt("Digite sua nova senha:");
+
+      if (!senhaAtual || !novaSenha) {
+        alert("As senhas não podem ficar vazias!");
+        return;
+      }
+
+      const corpo = {
+        senhaAtual: senhaAtual,
+        novaSenha: novaSenha
+      };
+
+      const URI = "http://localhost:5050/funcionario/" + idFuncionario + "/senha";
+
+      fetch(URI, {
+        method: "PUT",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + objUsuario.token
+        },
+        body: JSON.stringify(corpo)
+      })
+      .then(res => res.json())
+      .then(dados => {
+        alert(dados.msg);
+      })
+      .catch(err => console.error("Erro ao alterar senha:", err));
+    }
+
+    // ===== MODAL DE ALTERAÇÃO DE SENHA =====
+    const modal = document.getElementById("modalAlterarSenha");
+    const btnConfirmar = document.getElementById("btnConfirmarSenha");
+    const btnCancelar = document.getElementById("btnCancelarSenha");
+    let funcionarioAtual = null;
+
+    function abrirModalSenha(idFuncionario) {
+      funcionarioAtual = idFuncionario;
+      modal.style.display = "flex";
+    }
+
+    btnCancelar.onclick = function () {
+      modal.style.display = "none";
+      limparCamposModal();
+    };
+
+    btnConfirmar.onclick = function () {
+      const senhaAtual = document.getElementById("senhaAtual").value;
+      const novaSenha = document.getElementById("novaSenha").value;
+
+      if (!senhaAtual || !novaSenha) {
+        alert("Preencha todos os campos!");
+        return;
+      }
+
+      const corpo = {
+        senhaAtual: senhaAtual,
+        novaSenha: novaSenha
+      };
+
+      const URI = "http://localhost:5050/funcionario/" + funcionarioAtual + "/senha";
+
+      fetch(URI, {
+        method: "PUT",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + objUsuario.token
+        },
+        body: JSON.stringify(corpo)
+      })
+      .then(res => res.json())
+      .then(dados => {
+        alert(dados.msg);
+        modal.style.display = "none";
+        limparCamposModal();
+      })
+      .catch(err => {
+        console.error("Erro ao alterar senha:", err);
+        alert("Erro ao alterar senha!");
+      });
+    };
+
+    function limparCamposModal() {
+      document.getElementById("senhaAtual").value = "";
+      document.getElementById("novaSenha").value = "";
     }
   </script>
 </body>

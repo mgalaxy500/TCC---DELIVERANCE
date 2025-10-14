@@ -13,7 +13,7 @@ module.exports = class FuncionarioMiddleware {
         }
         const emailFuncionario = request.body.funcionario.emailFuncionario;
         const funcionario = new Funcionario();
-        const is = await funcionario.isFuncionarioByNome(emailFuncionario);
+        const is = await funcionario.isFuncionarioByEmail(emailFuncionario);
 
         if (is == false) {
             next();
