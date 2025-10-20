@@ -6,7 +6,7 @@ body {
   font-size: 14px; 
   line-height: 1.5;
   height: 100vh;
-  overflow: hidden; 
+  overflow-y: auto; 
 }
 
 /* ===== FAIXA AZUL SUPERIOR ===== */
@@ -38,10 +38,10 @@ body {
   gap: 10px;
   max-width: 1200px;
   margin: 0 auto;
-  height: calc(100vh - 160px);
+  min-height: calc(100vh - 160px);
+  overflow: visible; /* permite scroll interno em painéis */
   padding: 100px 10px 60px 10px;
   box-sizing: border-box;
-  overflow: hidden; 
   min-height: 600px; 
 }
 
