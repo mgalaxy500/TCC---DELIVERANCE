@@ -10,10 +10,20 @@ body {
 }
 
 /* ===== FAIXA AZUL SUPERIOR ===== */
-.faixa-topo,
-.faixa-base {
+.faixa-topo
+ {
   background-color: rgb(27, 54, 93);
   height: 80px;
+  width: 100%;
+  position: fixed;
+  left: 0;
+  z-index: 1000;
+}
+
+.faixa-base
+ {
+  background-color: rgb(27, 54, 93);
+  height: 50px;
   width: 100%;
   position: fixed;
   left: 0;
@@ -25,7 +35,7 @@ body {
 
 /* ===== LOGO UNIVAP ===== */
 .univap-logo img {
-  position: absolute;
+  position: fixed;
   top: -45px;
   left: 20px;
   width: 180px;
@@ -40,7 +50,7 @@ body {
   margin: 0 auto;
   min-height: calc(100vh - 160px);
   overflow: visible; /* permite scroll interno em painéis */
-  padding: 100px 10px 60px 10px;
+  padding: 100px 10px 30px 10px;
   box-sizing: border-box;
   min-height: 600px; 
 }
@@ -62,7 +72,7 @@ body {
   padding: 6px;
   border-radius: 4px;
   text-align: center;
-  margin-bottom: 12px;
+  margin-bottom: 1px;
   font-size: 12px;
   font-weight: bold;
 }
