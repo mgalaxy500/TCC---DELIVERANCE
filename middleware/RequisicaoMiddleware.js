@@ -1,5 +1,6 @@
 
 const Requisicao = require('../model/Requisicao');
+const Aluno = require('../model/Aluno');
 
 const express = require('express');
 const app = express();
@@ -46,6 +47,41 @@ module.exports = class RequisicaoMiddleware {
         }
 
         next();
+    }
+
+    async is_alunoByMatriculaAluno(request, response, next) {
+        try {
+            const matriculaAluno = request.body.requisicao.matriculaAluno;
+
+            if (!matriculaAluno) {
+                return response.status(400).send({
+                    status: false,
+                    msg: "Matrícula do aluno não informada."
+                });
+            }
+
+            const objAluno = new Aluno();
+            objAluno.matriculaAluno = matriculaAluno;
+
+            const alunoExiste = await objAluno.isAlunoByMatricula(matriculaAluno);
+
+            if (!alunoExiste) {
+                // Se a matrícula não existe, retorna erro
+                return response.status(404).send({
+                    status: false,
+                    msg: "Aluno não encontrado para a matrícula informada."
+                });
+            }
+
+            // Se existe, segue para o próximo middleware
+            next();
+        } catch (err) {
+            console.error("Erro interno:", err);
+            return response.status(500).send({
+                status: false,
+                msg: "Erro interno ao verificar matrícula do aluno."
+            });
+        }
     }
 
 }

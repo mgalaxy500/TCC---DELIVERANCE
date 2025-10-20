@@ -35,6 +35,7 @@ module.exports = class RequisicaoRouter {
         this.router.post('/',
             this.jwtMiddleware.validate,
             this.RequisicaoMiddleware.validar_MatriculaAluno,
+            this.RequisicaoMiddleware.is_alunoByMatriculaAluno,
             this.RequisicaoMiddleware.validar_DataProva,
             this.RequisicaoControl.create
         );

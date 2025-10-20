@@ -67,12 +67,17 @@ class Disciplina {
 
     async delete() {
         const conexao = Banco.getConexao();
+        const SQL_DELETE_REQUISICAO = 'DELETE FROM requisicao WHERE disciplina_idDisciplina = ?;';
         const SQL = 'DELETE FROM disciplina WHERE idDisciplina = ?;';
+
         try {
+            const [resultRequisicao] = await conexao.promise().execute(SQL_DELETE_REQUISICAO, [this._idDisciplina]);
+            console.log('Requisições deletadas:', resultRequisicao.affectedRows);
+
             const [result] = await conexao.promise().execute(SQL, [this._idDisciplina]);
             return result.affectedRows > 0;
         } catch (error) {
-            console.error('Erro ao excluir a disciplina:', error);
+            console.error('Erro ao excluir a disciplina e/ou suas requisições:', error);
             return false;
         }
     }

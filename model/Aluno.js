@@ -57,20 +57,27 @@ class Aluno {
     
     // Método assíncrono para excluir um aluno do banco de dados.
     async delete() {
-
         if (!this._matriculaAluno) {
             console.error('matriculaAluno está undefined ou null!');
             return false;
         }
-        const conexao = Banco.getConexao();  // Obtém a conexão com o banco de dados.
-        const SQL = 'DELETE FROM aluno WHERE matriculaAluno = ?;';  // Query SQL para deletar um aluno pelo ID.
+
+        const conexao = Banco.getConexao();
+
+        const SQL_DELETE_REQUISICAO = 'DELETE FROM requisicao WHERE aluno_matriculaAluno = ?;';
+        const SQL_DELETE_ALUNO = 'DELETE FROM aluno WHERE matriculaAluno = ?;';
 
         try {
-            const [result] = await conexao.promise().execute(SQL, [this._matriculaAluno]);  // Executa a query de exclusão.
-            return result.affectedRows > 0;  // Retorna true se alguma linha foi afetada (aluno deletado).
+            const [resultRequisicao] = await conexao.promise().execute(SQL_DELETE_REQUISICAO, [this._matriculaAluno]);
+            console.log('Requisições deletadas:', resultRequisicao.affectedRows);
+
+            const [resultAluno] = await conexao.promise().execute(SQL_DELETE_ALUNO, [this._matriculaAluno]);
+            console.log('Aluno deletado:', resultAluno.affectedRows);
+
+            return resultAluno.affectedRows > 0;
         } catch (error) {
-            console.error('Erro ao excluir o aluno:', error);  // Exibe erro no console se houver falha.
-            return false;  // Retorna false caso ocorra um erro.
+            console.error('Erro ao excluir o aluno e/ou suas requisições:', error);
+            return false;
         }
     }
 

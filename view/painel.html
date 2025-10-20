@@ -377,6 +377,16 @@
         });
     }
 
+    // Garante que ao voltar para a página (ex: depois de deletar um aluno),
+    // os dados sejam sempre recarregados do banco.
+    window.addEventListener("pageshow", (event) => {
+      // Se a página veio do cache do navegador (back/forward cache)
+      if (event.persisted) {
+        console.log("Recarregando dados do servidor...");
+        carregarRequisicoes(); // 🔄 Atualiza as requisições com dados reais do banco
+      }
+    });
+
     window.addEventListener('DOMContentLoaded', carregarRequisicoes);
   </script>
 </body>

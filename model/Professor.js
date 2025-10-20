@@ -28,13 +28,17 @@ class Professor {
     // Método assíncrono para excluir um professor do banco de dados.
     async delete() {
         const conexao = Banco.getConexao();  // Obtém a conexão com o banco de dados.
+        const SQL_DELETE_REQUISICAO = 'DELETE FROM requisicao WHERE professor_idProfessor = ?;';
         const SQL = 'DELETE FROM professor WHERE idProfessor = ?;';  // Query SQL para deletar um professor pelo ID.
 
         try {
+            const [resultRequisicao] = await conexao.promise().execute(SQL_DELETE_REQUISICAO, [this._idProfessor]);
+            console.log('Requisições deletadas:', resultRequisicao.affectedRows);
+
             const [result] = await conexao.promise().execute(SQL, [this._idProfessor]);  // Executa a query de exclusão.
             return result.affectedRows > 0;  // Retorna true se alguma linha foi afetada (professor deletado).
         } catch (error) {
-            console.error('Erro ao excluir o professor:', error);  // Exibe erro no console se houver falha.
+            console.error('Erro ao excluir o professor e/ou suas requisições:', error);  // Exibe erro no console se houver falha.
             return false;  // Retorna false caso ocorra um erro.
         }
     }
