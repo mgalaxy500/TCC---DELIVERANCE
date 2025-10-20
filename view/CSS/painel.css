@@ -285,3 +285,93 @@ body {
   background-color: #fff3cd;
   color: #856404;
 }
+
+/* ===== LADO ESQUERDO: CONTROLE ===== */
+.painel-controle {
+  width: 40%;
+  background-color: white;
+  padding: 12px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  align-self: flex-start;
+
+  /* Adicionando scroll interno */
+  max-height: calc(100vh - 160px); /* altura do painel excluindo faixas */
+  overflow-y: auto;
+}
+
+/* Scrollbar do painel esquerdo (modo claro) */
+.painel-controle::-webkit-scrollbar {
+  width: 8px;
+}
+.painel-controle::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 8px;
+}
+.painel-controle::-webkit-scrollbar-thumb:hover {
+  background-color: #999;
+}
+
+/* ===== CONTAINER COM SCROLL INDEPENDENTE (lado direito) ===== */
+.requerimentos-container {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* Scrollbar da lista de requerimentos (modo claro) */
+.requerimentos-container::-webkit-scrollbar {
+  width: 8px;
+}
+.requerimentos-container::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 8px;
+}
+.requerimentos-container::-webkit-scrollbar-thumb:hover {
+  background-color: #999;
+}
+
+/* ===== LADO ESQUERDO: CONTROLE ===== */
+.painel-controle {
+  width: 40%;
+  background-color: white;
+  padding: 12px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  align-self: flex-start;
+
+  /* Adicionando scroll interno */
+  max-height: calc(100vh - 160px); /* altura do painel excluindo faixas */
+  overflow-y: auto;
+}
+
+/* Scrollbar do painel esquerdo (modo claro) */
+.painel-controle::-webkit-scrollbar {
+  width: 8px;
+}
+.painel-controle::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 8px;
+}
+.painel-controle::-webkit-scrollbar-thumb:hover {
+  background-color: #999;
+}
+
+/* ===== CONTAINER COM SCROLL INDEPENDENTE (lado direito) ===== */
+.requerimentos-container {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* Scrollbar da lista de requerimentos (modo claro) */
+.requerimentos-container::-webkit-scrollbar {
+  width: 8px;
+}
+.requerimentos-container::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 8px;
+}
+.requerimentos-container::-webkit-scrollbar-thumb:hover {
+  background-color: #999;
+}
