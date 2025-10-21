@@ -184,7 +184,24 @@
           { header: 'Bimestre', key: 'bimestreRequisicao', width: 10 }
         ];
 
-        requisicoes.forEach(req => worksheet.addRow(req));
+        requisicoes.forEach(req => {
+          const linha = { ...req };
+
+          // 🔹 1. Traduz o status (0 → Aprovado, 1 → Pendente)
+          linha.statusRequisicao = (linha.statusRequisicao == 0) ? "Aprovado" : "Pendente";
+
+          // 🔹 2. Mostra só a parte da data antes do "T"
+          if (linha.dataRequisicao && typeof linha.dataRequisicao === "string") {
+            linha.dataRequisicao = linha.dataRequisicao.split("T")[0];
+          }
+
+          // 🔹 3. Mostra só os dois primeiros caracteres do bimestre
+          if (linha.bimestreRequisicao && typeof linha.bimestreRequisicao === "string") {
+            linha.bimestreRequisicao = linha.bimestreRequisicao.substring(0, 2);
+          }
+
+          worksheet.addRow(linha);
+        });
 
         const agora = new Date();
         const nomeArquivo = `Requisicoes_${agora.toISOString().replace(/[:T]/g, '-').slice(0, 16)}.xlsx`;

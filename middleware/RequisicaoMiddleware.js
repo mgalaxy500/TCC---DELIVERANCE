@@ -39,10 +39,10 @@ module.exports = class RequisicaoMiddleware {
         // diferença em milissegundos -> horas
         const diffHoras = (agora - dataProva) / (1000 * 60 * 60);
 
-        if (diffHoras > 48) {
+        if (diffHoras > 72) {
             return response.status(400).send({
                 status: false,
-                msg: "Não é permitido registrar requisições de provas que ocorreram há mais de 48 horas"
+                msg: "Não é permitido registrar requisições de provas que ocorreram há mais de 2 dias"
             });
         }
 
