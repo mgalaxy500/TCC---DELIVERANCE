@@ -175,6 +175,32 @@
       });
     }
 
+    btnUpload.onclick = function (event) {
+        event.preventDefault(); // <-- Adicione esta linha
+        const dados = new FormData();
+        dados.append('variavelArquivo', arquivo.files[0]);
+
+        const URI = "http://localhost:5050/funcionario/csv/";
+        fetch(URI, {
+            method: "POST",
+            body: dados,
+            headers: {
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_alunos();
+            const resposta = JSON.parse(respostaConvertida);
+            if (resposta.status == true) {
+                alert("Funcionarios cadastrados com sucesso");
+            }
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
     function construirTabela(JSON_FUNCIONARIOS, filtro) {
       limparTabela();
 
