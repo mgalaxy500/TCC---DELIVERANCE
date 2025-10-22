@@ -174,7 +174,7 @@
       const dados = new FormData();
       dados.append('variavelArquivo', arquivo.files[0]);
 
-      const URI = "http://localhost:5050/aluno/csv/";
+      const URI = "http://localhost:5050/professor/csv/";
       fetch(URI, {
           method: "POST",
           body: dados,
@@ -185,10 +185,10 @@
           return resposta.text();
       }).then(respostaConvertida => {
           console.log(respostaConvertida);
-          get_alunos();
+          get_professors();
           const resposta = JSON.parse(respostaConvertida);
           if (resposta.status == true) {
-              alert("Alunos cadastrados com sucesso");
+              alert("Professores cadastrados com sucesso");
           }
       }).catch(erro => {
           console.log(erro);

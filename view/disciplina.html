@@ -127,10 +127,10 @@
             return resposta.text();
         }).then(respostaConvertida => {
             console.log(respostaConvertida);
-            get_alunos();
+            get_disciplinas();
             const resposta = JSON.parse(respostaConvertida);
             if (resposta.status == true) {
-                alert("Alunos cadastrados com sucesso");
+                alert("Disciplinas cadastrados com sucesso");
             }
         }).catch(erro => {
             console.log(erro);
