@@ -6,6 +6,8 @@ const RequisicaoRouter = require('./router/RequisicaoRouter');
 const FuncionarioRouter = require('./router/FuncionarioRouter');
 const AlunoRouter = require('./router/AlunoRouter');
 const LoginRouter = require('./router/LoginRouter');
+const EntradaRouter = require('./router/EntradaRouter');
+const ConfirmarRouter = require('./router/ConfirmarRouter');
 const cors = require('cors');
 
 const app = express();
@@ -22,6 +24,9 @@ const requisicaoRouter = new RequisicaoRouter();
 const funcionarioRouter = new FuncionarioRouter();
 const alunoRouter = new AlunoRouter();
 const loginRouter = new LoginRouter();
+const confirmarRouter = new ConfirmarRouter();
+const entradaRouter = new EntradaRouter();
+
 
 app.use(cors({
     origin: ['http://localhost:5050', 'http://127.0.0.1:5050'], // permite requisições apenas do frontend específico
@@ -51,6 +56,14 @@ app.use('/funcionario',
 
 app.use('/aluno',
     alunoRouter.createRoutes()
+);
+
+app.use('/entrada',
+    entradaRouter.createRoutes()
+);
+
+app.use('/confirmar',
+    confirmarRouter.createRoutes()
 );
 
 // Inicia o servidor, escutando na porta definida, e exibe uma mensagem no console com a URL onde o servidor está rodando.

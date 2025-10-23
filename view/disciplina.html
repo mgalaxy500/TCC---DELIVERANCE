@@ -14,7 +14,6 @@
     <div class="univap-logo">
         <img src="Imagens/Univap[Negativo].png" alt="Logo Univap" />
     </div>
-    <div class="faixa-base"></div>
   </div>
   
   <div id="container">
@@ -224,7 +223,7 @@
             txtAlterarNome.id = "nomeDisciplina_" + disciplina.nomeDisciplina;
             txtAlterarNome.name = "nomeDisciplina"; 
 
-            const btnExcluir = document.createElement("button");
+            const btnExcluir = document.createElement("button-delete");
             btnExcluir.appendChild(document.createTextNode("Excluir"));
             btnExcluir.onclick = function () {
                 delete_disciplina(disciplina.idDisciplina);
