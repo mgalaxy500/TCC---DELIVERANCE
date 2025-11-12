@@ -54,7 +54,9 @@ h1 {
   color: #333;
   margin-bottom: 30px;
 }
-
+  button-delete:hover {
+  background-color: #882121;
+} 
 /* ===== FORMULÁRIO ===== */
 .form-container {
   display: flex;

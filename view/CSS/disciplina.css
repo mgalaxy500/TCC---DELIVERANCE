@@ -18,7 +18,9 @@ body {
   left: 0;
   z-index: 1000;
 }
-
+  button-delete:hover {
+  background-color: #882121;
+}
 .faixa-topo {
   top: 0;
 }

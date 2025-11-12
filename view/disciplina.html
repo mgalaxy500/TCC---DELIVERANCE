@@ -223,7 +223,7 @@
             txtAlterarNome.id = "nomeDisciplina_" + disciplina.nomeDisciplina;
             txtAlterarNome.name = "nomeDisciplina"; 
 
-            const btnExcluir = document.createElement("button");
+            const btnExcluir = document.createElement("button-delete");
             btnExcluir.appendChild(document.createTextNode("Excluir"));
             btnExcluir.onclick = function () {
                 delete_disciplina(disciplina.idDisciplina);
