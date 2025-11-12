@@ -16,7 +16,7 @@ body {
 .faixa-topo,
 .faixa-base {
   background-color: rgb(27, 54, 93);
-  height: 80px;
+  height: 90px;
   width: 100%;
   position: fixed;
   left: 0;
@@ -34,7 +34,7 @@ body {
 /* ===== LOGO (opcional) ===== */
 .univap-logo img {
   position: absolute;
-  top: -45px;
+  top: -30px;
   left: 20px;
   width: 180px;
   z-index: 1001;

@@ -26,21 +26,20 @@
           <input type="text" id="txtMatricula" placeholder="Ex: 50230223">
         </div>
 
-        <div class="nome-aluno-container">
+        <div class="preview-container">
           <input type="text" id="nomeAlunoExibido" placeholder="Nome será exibido aqui" disabled>
         </div>
 
         <div class="disciplina-container">
           <p class="text-disciplina">Disciplina</p>
+
+          <!-- Campo de filtro embutido -->
+          <input type="text" id="filtroDisciplina" placeholder="Filtrar disciplina..." autocomplete="off" />
+
           <select id="disciplina" name="disciplina" required>
           </select>
         </div>
 
-        <div class="professor-container">
-          <p class="text-professor">Professor</p>
-          <select id="professor" name="professor" required>
-          </select>
-        </div>
       </div>
 
       <!-- Coluna 2: Campos de rádio -->
@@ -92,29 +91,30 @@
     </div>
   </div>
   <script>
-    const selectProfessor = document.getElementById("professor");
-    const selectDisciplina = document.getElementById("disciplina");
+  const selectProfessor = document.getElementById("professor");
+  const selectDisciplina = document.getElementById("disciplina");
 
-    const dadosLocalStorage = localStorage.getItem("dados");
-    const objUsuario = dadosLocalStorage ? JSON.parse(dadosLocalStorage) : null;
+  const dadosLocalStorage = localStorage.getItem("dados");
+  const objUsuario = dadosLocalStorage ? JSON.parse(dadosLocalStorage) : null;
 
-    let JSON_PROFESSORES = [];
-    let JSON_DISCIPLINAS = [];
-    let JSON_ALUNOS = [];
-
-    function get_alunos() {
-      if (!objUsuario || !objUsuario.token) {
-        console.error("Token de autenticação não encontrado.");
-        return;
+  let JSON_PROFESSORES = [];
+  let JSON_DISCIPLINAS = [];
+  let JSON_ALUNOS = [];
+  
+  
+  function get_alunos() {
+    if (!objUsuario || !objUsuario.token) {
+      console.error("Token de autenticação não encontrado.");
+      return;
+    }
+    const URI = "http://localhost:5050/aluno/";
+    fetch(URI, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + objUsuario.token
       }
-      const URI = "http://localhost:5050/aluno/";
-      fetch(URI, {
-        method: "GET",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + objUsuario.token
-        }
-      })
+    })
       .then(res => res.text())
       .then(respostaConvertida => {
         const dados = JSON.parse(respostaConvertida);
@@ -127,219 +127,311 @@
       .catch(erro => {
         console.error("Erro ao buscar alunos:", erro);
       });
+  }
+
+  
+
+  function get_professores() {
+    if (!objUsuario || !objUsuario.token) {
+      console.error("Token de autenticação não encontrado.");
+      return;
     }
 
-    function get_professores() {
-      if (!objUsuario || !objUsuario.token) {
-        console.error("Token de autenticação não encontrado.");
-        return;
+    const URI = "http://localhost:5050/professor/";
+
+    fetch(URI, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + objUsuario.token
       }
-
-      const URI = "http://localhost:5050/professor/";
-
-      fetch(URI, {
-        method: "GET",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + objUsuario.token
-        }
-      })
+    })
       .then(res => res.text())
       .then(respostaConvertida => {
         const dados = JSON.parse(respostaConvertida);
 
-        if (dados.professors && Array.isArray(dados.professors)) {
-          JSON_PROFESSORES = dados.professors;
-          montarComboProfessores();
-        } else {
-          console.warn("Resposta inesperada da API de professores:", dados);
-        }
+        // ajuste conforme sua API (pode ser `professor`, `professors`, etc.)
+        JSON_PROFESSORES = dados.professor || dados.professors || dados.professores || [];
+        montarComboProfessores();
+        // se as disciplinas já estiverem carregadas, atualize textos delas com nomes dos professores
+        if (JSON_DISCIPLINAS.length) montarComboDisciplinas(); 
       })
       .catch(erro => {
         console.error("Erro ao buscar professores:", erro);
       });
+  }
+
+  function get_disciplinas() {
+    if (!objUsuario || !objUsuario.token) {
+      console.error("Token de autenticação não encontrado.");
+      return;
     }
 
-    function get_disciplinas() {
-      if (!objUsuario || !objUsuario.token) {
-        console.error("Token de autenticação não encontrado.");
-        return;
+    const URI = "http://localhost:5050/disciplina/";
+
+    fetch(URI, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + objUsuario.token
       }
-
-      const URI = "http://localhost:5050/disciplina/";
-
-      fetch(URI, {
-        method: "GET",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + objUsuario.token
-        }
-      })
+    })
       .then(res => res.text())
       .then(respostaConvertida => {
         const dados = JSON.parse(respostaConvertida);
 
-        if (dados.disciplinas && Array.isArray(dados.disciplinas)) {
-          JSON_DISCIPLINAS = dados.disciplinas;
-          montarComboDisciplinas();
-        } else {
-          console.warn("Resposta inesperada da API de disciplinas:", dados);
-        }
+        // ajuste conforme sua API (pode ser `disciplina`, `disciplinas`, etc.)
+        JSON_DISCIPLINAS = dados.disciplina || dados.disciplinas || [];
+        montarComboDisciplinas();
       })
       .catch(erro => {
         console.error("Erro ao buscar disciplinas:", erro);
       });
+  }
+
+  function montarComboProfessores() {
+    selectProfessor.innerHTML = '<option value="" disabled selected hidden>Selecione um professor</option>';
+    for (let professor of JSON_PROFESSORES) {
+      const option = document.createElement("option");
+      option.value = professor.idProfessor;
+      option.text = professor.nomeProfessor;
+      selectProfessor.appendChild(option);
+    }
+  }
+
+  function montarComboDisciplinas() {
+    selectDisciplina.innerHTML = '<option value="" disabled selected hidden>Selecione uma disciplina</option>';
+
+    for (let disciplina of JSON_DISCIPLINAS) {
+      const option = document.createElement("option");
+      option.value = disciplina.idDisciplina;
+      // armazena o id do professor vinculado na própria option para acesso rápido
+      const profId = disciplina.professor_idProfessor ?? disciplina.professorId ?? disciplina.idProfessor ?? '';
+      option.dataset.professorId = String(profId);
+
+      // tenta encontrar o nome do professor para mostrar no texto da disciplina
+      const profObj = JSON_PROFESSORES.find(p => String(p.idProfessor) === String(profId));
+      const profName = profObj ? profObj.nomeProfessor : (profId ? `Professor #${profId}` : 'Sem professor');
+      option.text = `${disciplina.nomeDisciplina} — ${profName}`;
+
+      selectDisciplina.appendChild(option);
     }
 
-    function montarComboProfessores() {
-      selectProfessor.innerHTML = '<option value="" disabled selected hidden>Selecione um professor</option>';
-      for (let professor of JSON_PROFESSORES) {
-        const option = document.createElement("option");
-        option.value = professor.idProfessor;     
-        option.text = professor.nomeProfessor;    
-        selectProfessor.appendChild(option);
-      }
-    }
-
-    function montarComboDisciplinas() {
-      selectDisciplina.innerHTML = '<option value="" disabled selected hidden>Selecione uma disciplina</option>';
-
-      for (let disciplina of JSON_DISCIPLINAS) {
-        const option = document.createElement("option");
-        option.value = disciplina.idDisciplina;  
-        option.text = disciplina.nomeDisciplina;
-        selectDisciplina.appendChild(option);
-      }
-    }
-
-    window.onload = function () {
-      get_professores();
-      get_disciplinas();
-      get_alunos();
-    };
-
-    // Atualize o nome do aluno em tempo real
-    document.getElementById("txtMatricula").addEventListener("input", function() {
-      const matricula = this.value.trim();
-      const campoNome = document.getElementById("nomeAlunoExibido");
-      if (matricula.length === 0) {
-        campoNome.value = "";
+    // Ao mudar a disciplina, atualiza automaticamente o select de professor usando professor_idProfessor da disciplina
+    selectDisciplina.addEventListener('change', function () {
+      const professorId = this.selectedOptions[0]?.dataset?.professorId;
+      if (!professorId) {
+        selectProfessor.value = '';
         return;
       }
-      const matriculaInt = parseInt(matricula, 10);
-      const aluno = JSON_ALUNOS.find(a => Number(a.matriculaAluno) === matriculaInt);
-      campoNome.value = aluno ? aluno.nomeAluno : "Não encontrado";
+      // seleciona o professor correspondente no combo de professores (se existir)
+      const existe = Array.from(selectProfessor.options).some(o => o.value === String(professorId));
+      if (existe) {
+        selectProfessor.value = String(professorId);
+      } else {
+        // caso o combo de professores ainda não tenha sido populado, tenta adicionar a opção com nome conhecido
+        const prof = JSON_PROFESSORES.find(p => String(p.idProfessor) === String(professorId));
+        if (prof) {
+          const opt = document.createElement('option');
+          opt.value = prof.idProfessor;
+          opt.text = prof.nomeProfessor;
+          selectProfessor.appendChild(opt);
+          selectProfessor.value = String(prof.idProfessor);
+        } else {
+          // fallback apenas atribui o id (para envio)
+          selectProfessor.value = String(professorId);
+        }
+      }
+    });
+  }
+
+  // após declarar selectDisciplina e montarComboDisciplinas()
+  const filtroDisciplina = document.getElementById('filtroDisciplina');
+
+  // filtra as options do select em tempo real
+  filtroDisciplina.addEventListener('input', function () {
+    const q = this.value.trim().toLowerCase();
+    let anyVisible = false;
+    Array.from(selectDisciplina.options).forEach(opt => {
+      // mantém a opção placeholder (disabled, hidden no início) visível apenas quando q vazio
+      if (opt.disabled && opt.value === "") {
+        opt.hidden = q.length > 0;
+        return;
+      }
+      const text = (opt.text || '').toLowerCase();
+      const value = String(opt.value || '').toLowerCase();
+      const match = text.includes(q) || value.includes(q);
+      opt.hidden = !match;
+      if (!opt.hidden) anyVisible = true;
     });
 
-    const enviarBtn = document.getElementById('enviarBtn');
-    const overlay = document.getElementById('overlay');
-    const successMessage = document.getElementById('successMessage');
+    // se nenhuma opção visível, mostra um option temporário
+    let noOpt = selectDisciplina.querySelector('option[data-noresult="1"]');
+    if (!anyVisible) {
+      if (!noOpt) {
+        noOpt = document.createElement('option');
+        noOpt.value = "";
+        noOpt.text = "Nenhuma disciplina encontrada";
+        noOpt.disabled = true;
+        noOpt.dataset.noresult = "1";
+        selectDisciplina.appendChild(noOpt);
+      }
+    } else {
+      if (noOpt) noOpt.remove();
+    }
+  });
 
-    enviarBtn.onclick = function () {
-      post_requisicao();
-      
+  // ao pressionar Enter no filtro, seleciona a primeira opção visível
+  filtroDisciplina.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Enter') {
+      evt.preventDefault();
+      const firstVisible = Array.from(selectDisciplina.options).find(o => !o.hidden && !o.disabled);
+      if (firstVisible) {
+        selectDisciplina.value = firstVisible.value;
+        // dispara change para acionar lógica que atualiza professor
+        selectDisciplina.dispatchEvent(new Event('change', { bubbles: true }));
+        // limpa filtro (opcional)
+        // this.value = '';
+      }
+    }
+    // setas podem mover o foco para o select
+    if (evt.key === 'ArrowDown') {
+      evt.preventDefault();
+      selectDisciplina.focus();
+    }
+  });
+
+  window.onload = function () {
+    get_professores();
+    get_disciplinas();
+    get_alunos();
+  };
+
+  // Atualize o nome do aluno em tempo real
+  document.getElementById("txtMatricula").addEventListener("input", function () {
+    const matricula = this.value.trim();
+    const campoNome = document.getElementById("nomeAlunoExibido");
+    if (matricula.length === 0) {
+      campoNome.value = "";
+      return;
+    }
+    const matriculaInt = parseInt(matricula, 10);
+    const aluno = JSON_ALUNOS.find(a => Number(a.matriculaAluno) === matriculaInt);
+    campoNome.value = aluno ? aluno.nomeAluno : "Não encontrado";
+  });
+
+  const enviarBtn = document.getElementById('enviarBtn');
+  const overlay = document.getElementById('overlay');
+  const successMessage = document.getElementById('successMessage');
+
+  enviarBtn.onclick = function () {
+    post_requisicao();
+  };
+
+  overlay.onclick = () => {
+    overlay.style.opacity = '0';
+    overlay.style.visibility = 'hidden';
+    successMessage.style.opacity = '0';
+    successMessage.style.transform = 'translate(-50%, -50%) scale(0.8)';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      successMessage.style.display = 'none';
+    }, 300);
+  };
+
+  function post_requisicao() {
+    const URI = "http://localhost:5050/requisicao";
+
+    const dadosLocalStorage = localStorage.getItem("dados");
+    const objUsuario = JSON.parse(dadosLocalStorage);
+
+    const matriculaAluno = parseInt(document.getElementById("txtMatricula").value, 10);
+    const idDisciplina = document.getElementById("disciplina").value;
+
+    // pega o professor vinculado à disciplina (prioriza professor_id armazenado na option)
+    const selectedDiscOption = document.getElementById("disciplina").selectedOptions[0];
+    const idProfessorFromDisc = selectedDiscOption?.dataset?.professorId || document.getElementById("professor").value;
+
+    const dataRequisicao = document.getElementById("dataRequisicao").value;
+
+    const gNRequisicao = document.querySelector("input[name='opcao-semana']:checked")?.value;
+    const modeloRequisicao = document.querySelector("input[name='opcao-prova']:checked")?.value;
+    const justRequisicao = document.querySelector("input[name='opcao-requerimento']:checked")?.value;
+    const bimestreRequisicao = document.querySelector("input[name='opcao-bimestre']:checked")?.value;
+
+    const objRequisicao = {
+      requisicao: {
+        matriculaAluno: matriculaAluno,
+        idProfessor: idProfessorFromDisc, // usa o professor vinculado à disciplina
+        idDisciplina: idDisciplina,
+        justRequisicao: justRequisicao,
+        dataRequisicao: dataRequisicao,
+        gNRequisicao: gNRequisicao,
+        modeloRequisicao: modeloRequisicao,
+        statusRequisicao: 1,
+        bimestreRequisicao: bimestreRequisicao,
+      }
     };
 
-    overlay.onclick = () => {
-      overlay.style.opacity = '0';
-      overlay.style.visibility = 'hidden';
-      successMessage.style.opacity = '0';
-      successMessage.style.transform = 'translate(-50%, -50%) scale(0.8)';
-      setTimeout(() => {
-        overlay.style.display = 'none';
-        successMessage.style.display = 'none';
-      }, 300);
-    };
+    const errorDiv = document.getElementById("errorMessage");
 
-    function post_requisicao() {
-      const URI = "http://localhost:5050/requisicao";
+    fetch(URI, {
+      method: "POST",
+      body: JSON.stringify(objRequisicao),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + objUsuario.token
+      }
+    })
+      .then(resposta => resposta.text())
+      .then(respostaConvertida => {
+        const obj = JSON.parse(respostaConvertida);
 
-      const dadosLocalStorage = localStorage.getItem("dados");
-      const objUsuario = JSON.parse(dadosLocalStorage);
+        if (obj.status === true) {
+          errorDiv.style.display = "none"; // esconde erro se sucesso
+          console.log("Enviado:", JSON.stringify(objRequisicao));
+          enviarBtn.textContent = 'Enviando...';
+          enviarBtn.disabled = true;
 
-      const matriculaAluno = parseInt(document.getElementById("txtMatricula").value, 10);
-      const idDisciplina   = document.getElementById("disciplina").value;
-      const idProfessor    = document.getElementById("professor").value;
-      const dataRequisicao = document.getElementById("dataRequisicao").value;
-
-      const gNRequisicao = document.querySelector("input[name='opcao-semana']:checked")?.value;
-      const modeloRequisicao = document.querySelector("input[name='opcao-prova']:checked")?.value;
-      const justRequisicao   = document.querySelector("input[name='opcao-requerimento']:checked")?.value;
-      const bimestreRequisicao  = document.querySelector("input[name='opcao-bimestre']:checked")?.value;
-
-      const objRequisicao = {
-        requisicao: {
-          matriculaAluno: matriculaAluno,
-          idProfessor: idProfessor,
-          idDisciplina: idDisciplina,
-          justRequisicao: justRequisicao,
-          dataRequisicao: dataRequisicao,
-          gNRequisicao: gNRequisicao,
-          modeloRequisicao: modeloRequisicao,
-          statusRequisicao: 1,
-          bimestreRequisicao: bimestreRequisicao,
-        }
-      };
-
-      const errorDiv = document.getElementById("errorMessage");
-
-      fetch(URI, {
-        method: "POST",
-        body: JSON.stringify(objRequisicao),
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + objUsuario.token
-        }
-      })
-        .then(resposta => resposta.text())
-        .then(respostaConvertida => {
-          const obj = JSON.parse(respostaConvertida);
-
-          if (obj.status === true) {
-            errorDiv.style.display = "none"; // esconde erro se sucesso
-            console.log("Enviado:", JSON.stringify(objRequisicao));
-            enviarBtn.textContent = 'Enviando...';
-            enviarBtn.disabled = true;
+          setTimeout(() => {
+            overlay.style.display = 'block';
+            successMessage.style.display = 'block';
 
             setTimeout(() => {
-              overlay.style.display = 'block';
-              successMessage.style.display = 'block';
+              overlay.style.opacity = '1';
+              overlay.style.visibility = 'visible';
+              successMessage.style.opacity = '1';
+              successMessage.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 50);
+
+            enviarBtn.textContent = 'Enviar';
+            enviarBtn.disabled = false;
+
+            setTimeout(() => {
+              overlay.style.opacity = '0';
+              overlay.style.visibility = 'hidden';
+              successMessage.style.opacity = '0';
+              successMessage.style.transform = 'translate(-50%, -50%) scale(0.8)';
 
               setTimeout(() => {
-                overlay.style.opacity = '1';
-                overlay.style.visibility = 'visible';
-                successMessage.style.opacity = '1';
-                successMessage.style.transform = 'translate(-50%, -50%) scale(1)';
-              }, 50);
-
-              enviarBtn.textContent = 'Enviar';
-              enviarBtn.disabled = false;
-
-              setTimeout(() => {
-                overlay.style.opacity = '0';
-                overlay.style.visibility = 'hidden';
-                successMessage.style.opacity = '0';
-                successMessage.style.transform = 'translate(-50%, -50%) scale(0.8)';
-
-                setTimeout(() => {
-                  overlay.style.display = 'none';
-                  successMessage.style.display = 'none';
-                }, 300);
-              }, 3000);
-            }, 1000);
-          } else {
-            errorDiv.style.display = "block";
-            errorDiv.textContent = obj.msg || "Erro ao enviar requerimento";
-          }
-        })
-        .catch(erro => {
-          console.log("Erro na requisição:", erro);
+                overlay.style.display = 'none';
+                successMessage.style.display = 'none';
+              }, 300);
+            }, 3000);
+          }, 1000);
+        } else {
           errorDiv.style.display = "block";
-          errorDiv.textContent = "Erro inesperado ao enviar requisição";
-        });
-    }
-  </script>
+          errorDiv.textContent = obj.msg || "Erro ao enviar requerimento";
+        }
+      })
+      .catch(erro => {
+        console.log("Erro na requisição:", erro);
+        errorDiv.style.display = "block";
+        errorDiv.textContent = "Erro inesperado ao enviar requisição";
+      });
+  }
+</script>
 </body>
 
 </html>
