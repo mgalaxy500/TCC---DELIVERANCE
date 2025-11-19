@@ -1,0 +1,163 @@
+Abaixo está um manual objetivo para instalar dependências do projeto, configurar o banco e rodar a aplicação em Windows (diretórios e comandos adaptados ao seu workspace c:\xampp\htdocs).
+
+1. Requisitos
+-Node.js (versão LTS) + npm — https://nodejs.org/
+-XAMPP (Apache + MySQL) — https://www.apachefriends.org/
+-Git (opcional)
+
+
+
+2. Preparar ambiente (Windows / PowerShell)
+-# abrir PowerShell como Administrador
+-# entrar na pasta do projeto
+-cd C:\xampp\htdocs\
+-# (opcional) clonar repositório
+-# git clone <repo-url> nome-do-projeto
+-# cd nome-do-projeto
+
+
+
+3. Instalar dependências Node (no diretório do projeto)
+Se existir package.json:
+-npm install
+
+Se não existir ou faltar pacotes comuns, instale estes que o projeto usa (Express, DB, uploads, JWT, CSV, dev tools):
+-npm install express mysql2 csv-parser multer jsonwebtoken bcryptjs cors
+-npm install --save-dev nodemon
+
+
+
+4. Configurar MySQL (XAMPP)
+Abra XAMPP Control Panel e inicie MySQL.
+Criar banco e tabelas (exemplo). Execute no phpMyAdmin ou MySQL Shell:
+
+CREATE DATABASE univap CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+USE univap;
+
+CREATE TABLE professor (
+  idProfessor INT AUTO_INCREMENT PRIMARY KEY,
+  nomeProfessor VARCHAR(45) NOT NULL
+);
+
+CREATE TABLE disciplina (
+  idDisciplina INT AUTO_INCREMENT PRIMARY KEY,
+  nomeDisciplina VARCHAR(45) NOT NULL,
+  professor_idProfessor INT,
+  FOREIGN KEY (professor_idProfessor) REFERENCES professor(idProfessor)
+);
+
+CREATE TABLE aluno (
+  matriculaAluno INT PRIMARY KEY,
+  nomeAluno VARCHAR(100),
+  turmaAluno VARCHAR(20)
+);
+
+CREATE TABLE requisicao (
+  idRequisicao INT AUTO_INCREMENT PRIMARY KEY,
+  aluno_matriculaAluno INT,
+  disciplina_idDisciplina INT,
+  professor_idProfessor INT,
+  justRequisicao VARCHAR(45),
+  dataRequisicao DATETIME,
+  gNRequisicao VARCHAR(45),
+  modeloRequisicao VARCHAR(45),
+  statusRequisicao TINYINT(1),
+  bimestreRequisicao VARCHAR(2),
+  FOREIGN KEY (aluno_matriculaAluno) REFERENCES aluno(matriculaAluno),
+  FOREIGN KEY (disciplina_idDisciplina) REFERENCES disciplina(idDisciplina),
+  FOREIGN KEY (professor_idProfessor) REFERENCES professor(idProfessor)
+);
+
+CREATE TABLE funcionario (
+  idFuncionario INT AUTO_INCREMENT PRIMARY KEY,
+  nomeFuncionario VARCHAR(45),
+  emailFuncionario VARCHAR(100),
+  senhaFuncionario VARCHAR(255)
+);
+
+
+
+5. Ajustar configuração de conexão (Banco.js)
+Abra Banco.js e ajuste host/user/password/database.
+Exemplo mínimo se usar variáveis de ambiente (crie .env na raiz do projeto):
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=
+DB_NAME=univap
+DB_PORT=3306
+PORT=5050
+
+Se Banco.js não usa .env, edite diretamente as credenciais no arquivo.
+
+
+
+6. Popular dados de teste
+Inserir alguns professores, disciplinas e alunos:
+INSERT INTO professor (nomeProfessor) VALUES ('Alberson'),('Wagner');
+INSERT INTO disciplina (nomeDisciplina, professor_idProfessor) VALUES ('Redes',1),('Matemática',2);
+INSERT INTO aluno (matriculaAluno,nomeAluno,turmaAluno) VALUES (50231028,'Mário','3H'),(50231024,'Bernardo','3H');
+
+7. Rodar a API/servidor
+No diretório do projeto:
+# com nodemon (recarrega automaticamente)
+npx nodemon app.js
+
+# ou sem nodemon
+node app.js
+
+Confirme logs: deve entrar mensagem de servidor ouvindo (p.ex. porta 5050).
+
+
+
+8. Testes rápidos
+Testar GET alunos (se houver JWT middleware, forneça token):
+# se endpoint público
+curl http://localhost:5050/aluno/
+
+# se precisa token (substitua TOKEN)
+curl -H "Authorization: Bearer TOKEN" http://localhost:5050/aluno/
+
+
+
+9. Frontend / páginas
+Se usa Apache (XAMPP), abra no navegador:
+http://localhost/<pasta-do-projeto>/view/requisicao.html
+Se o front é servido pela própria API Express (static), abra o endereço fornecido pelo servidor.
+
+
+
+10. Upload CSV / endpoints específicos
+Para endpoints que recebem arquivo CSV (multer), use curl multipart:
+curl -X POST -H "Authorization: Bearer TOKEN" -F "arquivo=@C:\caminho\para\disciplina.csv" http://localhost:5050/disciplina/uploadCSV
+(Ajuste URL e nome do campo conforme sua rota)
+
+
+
+11. Problemas comuns e soluções rápidas
+401 Unauthorized: envie header Authorization: Bearer <token> ou desabilite temporariamente middleware JWT para teste.
+ER_BAD_NULL_ERROR no INSERT: verifique se os campos usados no INSERT estão recebendo valores não nulos; adicione console.log() no controller antes do save.
+TypeError: Cannot read properties of undefined (reading 'emailFuncionario') — significa body não tem a estrutura esperada; verifique JSON enviado e middlewares express.json() aplicados na ordem correta.
+
+
+
+12. Scripts úteis (package.json)
+Adicione ao package.json (se quiser):
+"scripts": {
+  "start": "node app.js",
+  "dev": "nodemon app.js"
+}
+
+E então:
+npm run dev
+
+
+
+13. Resumo final (ordem de execução)
+
+Instale Node e XAMPP.
+Coloque o projeto em C:\xampp\htdocs\ (ou clone).
+Abra MySQL (XAMPP) e crie DB/tabelas (SQL acima).
+Ajuste Banco.js/.env com credenciais do DB.
+npm install no diretório do projeto.
+Start MySQL e rode node app.js (ou npm run dev).
+Abra as páginas front-end no browser ou consulte endpoints via curl/Postman
